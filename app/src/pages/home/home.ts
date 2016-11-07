@@ -34,7 +34,7 @@ export class HomePage {
 
   }
 
-  clickSendLocation(event){
+  clickSendLocation(){
     this.navCtrl.push(ContactsPage);
   }
 
