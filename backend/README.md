@@ -2,7 +2,7 @@
 
 ### Routes
 
-- **POST** /newUser
+###### **POST** /newUser
     body for posting a new user:
     `{ 
     	"id": #STRING, 
@@ -12,15 +12,15 @@
     }`
     
     
-- **GET** /getLocation/:id
+###### **GET** /getLocation/:id
     _:id_ is user id as #STRING
     
     
-- **GET** /getPushid/:id
+###### **GET** /getPushid/:id
     _:id_ is user id as #STRING
     
     
-- **POST** /giveAccess
+###### **POST** /giveAccess
     body for giving fromID user access to toID user:
     `{ 
     	"fromID": #STRING, 
