@@ -33,9 +33,10 @@ app.listen(port, function (err) {
 app.post('/newUser', function (req, res) {
 	var doc = req.body;
 
-	db.insert(doc, function (err, newDoc) {   // Callback is optional
+	db.insert(doc, function (err, newDoc) {
 		if(err){
 			cosole.log("error at DB insertion");
+			res.status(500).send('something broke!');
 		}
 		else{
 			console.log("Inserted new user in DB:");
@@ -46,12 +47,36 @@ app.post('/newUser', function (req, res) {
 	});
 });
 
-// GET all Users
-app.get('/', function (req, res) {
+// GET location of user :id
+app.get('/getLocation/:id', function (req, res) {
+	var id = req.params.id;
+
+	db.find({ id: id }, function (err, docs) {
+		if(err){
+			cosole.log("error at DB retrieval");
+			res.status(500).send('something broke!');
+		}
+		else {
+			var loc = docs[0].location;
+			res.send(loc);
+		}
+	});
 });
 
 //GET one user by id
-app.get('/:id', function (req, res) {
+app.get('/getPushid/:id', function (req, res) {
+	var id = req.params.id;
+
+	db.find({ id: id }, function (err, docs) {
+		if(err){
+			cosole.log("error at DB retrieval");
+			res.status(500).send('something broke!');
+		}
+		else {
+			var pushid = docs[0].pushid;
+			res.send(pushid);
+		}
+	});
 });
 
 
