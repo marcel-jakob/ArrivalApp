@@ -79,6 +79,22 @@ app.get('/getPushid/:id', function (req, res) {
 	});
 });
 
+//POST give user access
+app.post('/giveAccess', function (req, res) {
+	var fromID = req.body.fromID;
+	var toID = req.body.toID;
+
+	db.update({ id: fromID }, { $set: {access: toID}}, function (err, doc) {
+		if(err){
+			cosole.log("error at DB update");
+			res.status(500).send('something broke!');
+		}
+		else {
+			console.log(doc);
+			res.send("ok");
+		}
+	});
+});
 
 
 //export express app for tests etc.
