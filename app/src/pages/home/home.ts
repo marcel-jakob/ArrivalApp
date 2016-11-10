@@ -1,6 +1,7 @@
 import {Component, ViewChild, ElementRef} from '@angular/core';
-import {NavController} from 'ionic-angular';
+import {NavController, Platform} from 'ionic-angular';
 import {ContactsPage} from '../contacts/contacts';
+import {Geolocation} from 'ionic-native';
 
 declare var google;
 
@@ -8,33 +9,52 @@ declare var google;
   selector: 'page-home',
   templateUrl: 'home.html'
 })
+
 export class HomePage {
 
   @ViewChild('map') mapElement: ElementRef;
   map: any;
+  private platform: Platform;
+  private marker: any;
 
-  constructor(public navCtrl: NavController) {
-
-  }
-
-  ionViewDidLoad() {
+  constructor(public navCtrl: NavController, platform: Platform) {
+    this.platform = platform;
     this.loadMap();
   }
 
   loadMap() {
-    let latLng = new google.maps.LatLng(48.774369, 9.171814);
+    this.platform.ready().then(() => {
 
-    let mapOptions = {
-      center: latLng,
-      zoom: 13,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
+      let locationOptions = {
+        timeout: 10000,
+        enableHighAccuracy: true
+      };
 
-    this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+      Geolocation.getCurrentPosition(locationOptions).then((resp) => {
+        let position = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
+        let options = {
+          center: position,
+          zoom: 13,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
 
+        this.map = new google.maps.Map(
+          this.mapElement.nativeElement,
+          options
+        );
+        this.marker = new google.maps.Marker({
+          map: this.map,
+          animation: google.maps.Animation.DROP,
+          position: position
+        });
+      }).catch((error) => {
+        console.log('Error getting location', error);
+      })
+
+    })
   }
 
-  clickSendLocation(){
+  clickSendLocation() {
     this.navCtrl.push(ContactsPage);
   }
 
