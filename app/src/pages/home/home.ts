@@ -14,49 +14,48 @@ export class HomePage {
 
   @ViewChild('map') mapElement: ElementRef;
   map: any;
+  private platform: Platform;
+  private marker: any;
 
   constructor(public navCtrl: NavController, platform: Platform) {
-    platform.ready().then(() => {
-      this.loadMap();
-    });
-  }
-
-  ionViewDidLoad() {
+    this.platform = platform;
+    this.loadMap();
   }
 
   loadMap() {
-    console.log("load map");
-    Geolocation.getCurrentPosition().then((position) => {
-      console.log("location received");
-      console.log(position);
-      let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    this.platform.ready().then(() => {
 
-      let mapOptions = {
-        center: latLng,
-        zoom: 13,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+      let locationOptions = {
+        timeout: 10000,
+        enableHighAccuracy: true
       };
 
-      this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+      Geolocation.getCurrentPosition(locationOptions).then((resp) => {
+        let position = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
+        let options = {
+          center: position,
+          zoom: 13,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
 
-    }, (err) => {
-      console.log(err);
-    });
+        this.map = new google.maps.Map(
+          this.mapElement.nativeElement,
+          options
+        );
+        this.marker = new google.maps.Marker({
+          map: this.map,
+          animation: google.maps.Animation.DROP,
+          position: position
+        });
+      }).catch((error) => {
+        console.log('Error getting location', error);
+      })
 
+    })
   }
 
   clickSendLocation() {
     this.navCtrl.push(ContactsPage);
-  }
-
-  clickAddMarker() {
-
-    new google.maps.Marker({
-      map: this.map,
-      animation: google.maps.Animation.DROP,
-      position: this.map.getCenter()
-    });
-
   }
 
 }
