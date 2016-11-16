@@ -3,12 +3,14 @@ import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { ContactsPage } from '../pages/contacts/contacts';
+import { FirststartPage } from '../pages/firststart/firststart';
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    ContactsPage
+    ContactsPage,
+    FirststartPage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -17,7 +19,8 @@ import { ContactsPage } from '../pages/contacts/contacts';
   entryComponents: [
     MyApp,
     HomePage,
-    ContactsPage
+    ContactsPage,
+    FirststartPage
   ],
   providers: []
 })

@@ -1,22 +1,29 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
+import {HomePage} from '../home/home';
 
-/*
-  Generated class for the Firststart page.
-
-  See http://ionicframework.com/docs/v2/components/#navigation for more info on
-  Ionic pages and navigation.
-*/
 @Component({
   selector: 'page-firststart',
   templateUrl: 'firststart.html'
 })
 export class FirststartPage {
+  enteredUsr:any;
 
-  constructor(public navCtrl: NavController) {}
-
-  ionViewDidLoad() {
-    console.log('Hello FirststartPage Page');
+  constructor(public navCtrl: NavController) {
+    if(localStorage.getItem("username")){
+      this.navCtrl.setRoot(HomePage);
+    }
   }
 
+  ionViewDidLoad() {
+    //console.log("username is: " + localStorage.getItem("username"));
+  }
+
+  clickNext(){
+    if(this.enteredUsr != null) {
+      // save entered user to local storage
+      localStorage.setItem("username", this.enteredUsr);
+      this.navCtrl.push(HomePage);
+    }
+  }
 }
