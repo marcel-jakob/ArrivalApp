@@ -9,21 +9,13 @@ import {HomePage} from '../home/home';
 export class FirststartPage {
   enteredUsr:any;
 
-  constructor(public navCtrl: NavController) {
-    if(localStorage.getItem("username")){
-      this.navCtrl.setRoot(HomePage);
-    }
-  }
-
-  ionViewDidLoad() {
-    //console.log("username is: " + localStorage.getItem("username"));
-  }
+  constructor(public navCtrl: NavController) {}
 
   clickNext(){
     if(this.enteredUsr != null) {
       // save entered user to local storage
       localStorage.setItem("username", this.enteredUsr);
-      this.navCtrl.push(HomePage);
+      this.navCtrl.setRoot(HomePage);
     }
   }
 }

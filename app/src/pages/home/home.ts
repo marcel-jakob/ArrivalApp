@@ -1,7 +1,9 @@
 import {Component, ViewChild, ElementRef} from '@angular/core';
 import {NavController, Platform} from 'ionic-angular';
 import {ContactsPage} from '../contacts/contacts';
+import {FirststartPage} from '../firststart/firststart';
 import {Geolocation} from 'ionic-native';
+
 
 declare var google;
 
@@ -20,6 +22,16 @@ export class HomePage {
   constructor(public navCtrl: NavController, platform: Platform) {
     this.platform = platform;
     this.loadMap();
+
+    if(!localStorage.getItem("username")) {
+      this.navCtrl.setRoot(FirststartPage);
+    }
+  }
+
+  ionViewDidLoad() {
+    if(localStorage.getItem("username")) {
+      console.log("username is: " + localStorage.getItem("username"));
+    }
   }
 
   loadMap() {
