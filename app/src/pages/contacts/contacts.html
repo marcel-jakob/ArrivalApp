@@ -8,31 +8,14 @@
 
 <ion-content>
   <ion-list>
-    <ion-item>
+    <ion-item *ngFor="let contact of contacts">
       <ion-avatar item-left>
         <img src="https://api.adorable.io/avatars/285/1.png">
       </ion-avatar>
-      <h2>Person 1</h2>
-    </ion-item>
-    <ion-item>
-      <ion-avatar item-left>
-        <img src="https://api.adorable.io/avatars/285/1.png">
-      </ion-avatar>
-      <h2>Person 2</h2>
-    </ion-item>
-    <ion-item>
-      <ion-avatar item-left>
-        <img src="https://api.adorable.io/avatars/285/1.png">
-      </ion-avatar>
-      <h2>Person 3</h2>
-    </ion-item>
-    <ion-item>
-      <ion-avatar item-left>
-        <img src="https://api.adorable.io/avatars/285/1.png">
-      </ion-avatar>
-      <h2>Person 4</h2>
+      <h2>{{contact.name}}</h2>
     </ion-item>
   </ion-list>
+  {{notification}}
 
   <ion-footer>
     <ion-navbar>

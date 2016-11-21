@@ -5,16 +5,36 @@ var Datastore = require('nedb');
 // ### Server Config
 var port = process.env.PORT || 3000; //use 3000 or environment var
 
-// ### Express Config
-var bodyParser = require('body-parser');
-app.use(bodyParser.json());
-
 // ### NeDB connection
 db = new Datastore({ filename: './DB/users.db' });
 db.loadDatabase(function (err) {
 	if(err){
 		console.log("couldn't access DB")
 	}
+});
+
+// ### Express Config
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
+// ### fix CORS Problem on localhost
+app.use(function (req, res, next) {
+
+	// Website you wish to allow to connect
+	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8100');
+
+	// Request methods you wish to allow
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+	// Request headers you wish to allow
+	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+	// Set to true if you need the website to include cookies in the requests sent
+	// to the API (e.g. in case you use sessions)
+	res.setHeader('Access-Control-Allow-Credentials', true);
+
+	// Pass to next layer of middleware
+	next();
 });
 
 // ### Startup
@@ -102,15 +122,17 @@ app.get('/checkUser/:id', function (req, res) {
 
 	db.findOne({ id: id }, function (err, docs) {
 		if(err){
-			cosole.log("error at DB retrieval");
+			console.log("error at DB retrieval");
 			res.status(500).send('something broke!');
 		}
 		else {
 			if(docs === null){
 				res.send({"userExists":false});
+				console.log("User "+ id +" not found")
 			}
 			else{
 				res.send({"userExists":true});
+				console.log("User "+ id +" exists")
 			}
 		}
 	});
