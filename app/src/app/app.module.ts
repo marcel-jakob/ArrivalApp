@@ -4,13 +4,15 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { FirststartPage } from '../pages/firststart/firststart';
+import {AddContactPage} from "../pages/add-contact/add-contact";
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
     ContactsPage,
-    FirststartPage
+    FirststartPage,
+    AddContactPage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -20,7 +22,8 @@ import { FirststartPage } from '../pages/firststart/firststart';
     MyApp,
     HomePage,
     ContactsPage,
-    FirststartPage
+    FirststartPage,
+    AddContactPage
   ],
   providers: []
 })

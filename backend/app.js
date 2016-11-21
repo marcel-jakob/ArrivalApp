@@ -96,6 +96,25 @@ app.post('/giveAccess', function (req, res) {
 	});
 });
 
+//Check if user exists by userid
+app.get('/checkUser/:id', function (req, res) {
+	var id = req.params.id;
+
+	db.findOne({ id: id }, function (err, docs) {
+		if(err){
+			cosole.log("error at DB retrieval");
+			res.status(500).send('something broke!');
+		}
+		else {
+			if(docs === null){
+				res.send({"userExists":false});
+			}
+			else{
+				res.send({"userExists":true});
+			}
+		}
+	});
+});
 
 //export express app for tests etc.
 module.exports = app;
