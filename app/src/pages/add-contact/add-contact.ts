@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {NavController} from 'ionic-angular';
-import {BackendService} from "./backendService";
+import {BackendService} from "../../app/backendService";
 import {Storage} from '@ionic/storage';
 
 /*

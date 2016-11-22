@@ -5,7 +5,7 @@ import {HomePage} from '../pages/home/home';
 import {ContactsPage} from '../pages/contacts/contacts';
 import {FirststartPage} from '../pages/firststart/firststart';
 import {AddContactPage} from "../pages/add-contact/add-contact";
-import {BackendService} from "../pages/add-contact/backendService";
+import {BackendService} from "./backendService";
 
 
 @NgModule({
