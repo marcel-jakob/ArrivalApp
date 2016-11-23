@@ -23,9 +23,9 @@ export class HomePage {
     this.platform = platform;
     this.loadMap();
 
-    if(!localStorage.getItem("username")) {
-      this.navCtrl.setRoot(FirststartPage);
-    }
+
+    this.navCtrl.setRoot(FirststartPage);
+
   }
 
   ionViewDidLoad() {
