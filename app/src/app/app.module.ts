@@ -6,6 +6,7 @@ import {ContactsPage} from '../pages/contacts/contacts';
 import {FirststartPage} from '../pages/firststart/firststart';
 import {AddContactPage} from "../pages/add-contact/add-contact";
 import {BackendService} from "./backendService";
+import {Storage} from '@ionic/storage';
 
 
 @NgModule({
