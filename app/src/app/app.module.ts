@@ -1,11 +1,14 @@
 import {NgModule} from '@angular/core';
+import {Storage} from '@ionic/storage';
 import {IonicApp, IonicModule} from 'ionic-angular';
 import {MyApp} from './app.component';
 import {HomePage} from '../pages/home/home';
 import {ContactsPage} from '../pages/contacts/contacts';
 import {FirststartPage} from '../pages/firststart/firststart';
 import {AddContactPage} from "../pages/add-contact/add-contact";
-import {BackendService} from "./backendService";
+import {BackendService} from "./Services/backendService";
+import {LoginPage} from "../../.tmp/pages/login/login";
+import {RegistrationPage} from "../../.tmp/pages/registration/registration";
 
 
 @NgModule({
@@ -14,7 +17,9 @@ import {BackendService} from "./backendService";
     HomePage,
     ContactsPage,
     FirststartPage,
-    AddContactPage
+    AddContactPage,
+    LoginPage,
+    RegistrationPage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -25,7 +30,9 @@ import {BackendService} from "./backendService";
     HomePage,
     ContactsPage,
     FirststartPage,
-    AddContactPage
+    AddContactPage,
+    LoginPage,
+    RegistrationPage
   ],
   providers: [BackendService, Storage]
 })

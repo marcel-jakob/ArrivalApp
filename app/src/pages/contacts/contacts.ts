@@ -9,8 +9,8 @@ import {Storage} from '@ionic/storage';
   providers: [Storage]
 })
 export class ContactsPage {
-  private contacts: Array<any>;
-  private notification: string;
+  public contacts: Array<any>;
+  public notification: string;
 
   constructor(private navCtrl: NavController, private storage: Storage) {
 

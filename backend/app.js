@@ -7,7 +7,32 @@ var jwt = require('jsonwebtoken');
 var secretkey= require("./secretkey").key;
 
 // ### Server Config
-var port = process.env.PORT || 3000; //use 3000 or environment var
+//use 3000 for localhost
+//use 62000 on uberspace server
+var port = process.env.PORT || 62000;
+
+var allowCrossDomain = function(req, res, next) {
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8100');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,jwt');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    //res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // intercept OPTIONS method
+    if (req.method === 'OPTIONS' ) {
+        res.send(200);
+    }
+    else {
+        next();
+    }
+};
 
 // ### NeDB connection
 db = new Datastore({filename: './DB/users.db'});
@@ -22,34 +47,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 // ### fix CORS Problem on localhost
-app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8100');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
-});
-
-// ### Startup
-app.listen(port, function (err) {
-    if (err) {
-        console.error("express server failed: ", err);
-    }
-
-    console.log("express server started at :" + port);
-
-});
+app.use(allowCrossDomain);
 
 // ### create jwt
 /* ### remove on server!
@@ -60,8 +58,9 @@ app.get('/jwt', function (req, res) {
 });*/
 
 // ### only authorized access with jwt
-app.use(function (req, res, next) {
-    var token = req.headers['jwt'];
+/*app.use(function (req, res, next) {
+    //var token = req.headers['x-access-token'];
+    var token = req.body.jwt;
     if (token) {
 
         // verifies secret and checks exp
@@ -70,7 +69,7 @@ app.use(function (req, res, next) {
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
                 // if everything is good, save to request for use in other routes
-                //req.decoded = decoded;
+                req.jwtuser = decoded.user;
                 next();
             }
         });
@@ -85,7 +84,7 @@ app.use(function (req, res, next) {
         });
 
     }
-});
+});*/
 
 // ### ROUTES --------------------------------------------------------------------------
 
@@ -95,7 +94,7 @@ app.post('/newUser', function (req, res) {
 
     db.insert(doc, function (err, newDoc) {
         if (err) {
-            cosole.log("error at DB insertion");
+            console.log("error at DB insertion");
             res.status(500).send('something broke!');
         }
         else {
@@ -113,7 +112,7 @@ app.get('/getLocation/:id', function (req, res) {
 
     db.find({id: id}, function (err, docs) {
         if (err) {
-            cosole.log("error at DB retrieval");
+            console.log("error at DB retrieval");
             res.status(500).send('something broke!');
         }
         else {
@@ -129,7 +128,7 @@ app.get('/getPushid/:id', function (req, res) {
 
     db.find({id: id}, function (err, docs) {
         if (err) {
-            cosole.log("error at DB retrieval");
+            console.log("error at DB retrieval");
             res.status(500).send('something broke!');
         }
         else {
@@ -146,7 +145,7 @@ app.post('/giveAccess', function (req, res) {
 
     db.update({id: fromID}, {$set: {access: toID}}, function (err, doc) {
         if (err) {
-            cosole.log("error at DB update");
+            console.log("error at DB update");
             res.status(500).send('something broke!');
         }
         else {
@@ -178,5 +177,14 @@ app.get('/checkUser/:id', function (req, res) {
     });
 });
 
+// ### Startup
+app.listen(port, function (err) {
+    if (err) {
+        console.error("express server failed: ", err);
+    }
+
+    console.log("express server started at :" + port);
+
+});
 //export express app for tests etc.
 module.exports = app;

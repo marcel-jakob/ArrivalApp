@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {NavController} from 'ionic-angular';
-import {BackendService} from "../../app/backendService";
+import {BackendService} from "../../app/Services/backendService";
 import {Storage} from '@ionic/storage';
 
 /*
@@ -15,8 +15,8 @@ import {Storage} from '@ionic/storage';
   providers: [BackendService, Storage]
 })
 export class AddContactPage {
-  private enteredUser: any;
-  private responseText: string;
+  public enteredUser: any;
+  public responseText: string;
 
   constructor(private navCtrl: NavController, private backendService: BackendService, private storage: Storage) {
   }
