@@ -54,7 +54,7 @@ export class AddContactPage {
       let duplicatedUser = newContactList.filter(contact => contact.name === username);
 
       if (duplicatedUser.length === 0) {
-        newContactList.push({"name":username});
+        newContactList.push({"name": username});
         this.storage.set('contacts', newContactList);
         this.responseText = "Der Nutzer wurde gefunden und zu Ihren Kontakten hinzugefügt.";
         this.navCtrl.pop();

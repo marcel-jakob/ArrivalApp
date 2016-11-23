@@ -4,14 +4,16 @@ var Datastore = require('nedb');
 var jwt = require('jsonwebtoken');
 
 //key for jwt
-var secretkey= require("./secretkey").key;
+var secretkey = require("./secretkey").key;
 
 // ### Server Config
 //use 3000 for localhost
 //use 62000 on uberspace server
-var port = process.env.PORT || 62000;
+var port = 62000;
 
-var allowCrossDomain = function(req, res, next) {
+
+//Route Functions
+var allowCrossDomain = function (req, res, next) {
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8100');
 
@@ -26,47 +28,23 @@ var allowCrossDomain = function(req, res, next) {
     //res.setHeader('Access-Control-Allow-Credentials', true);
 
     // intercept OPTIONS method
-    if (req.method === 'OPTIONS' ) {
-        res.send(200);
+    if (req.method === 'OPTIONS') {
+        res.status(200);
+        res.send();
     }
     else {
         next();
     }
 };
 
-// ### NeDB connection
-db = new Datastore({filename: './DB/users.db'});
-db.loadDatabase(function (err) {
-    if (err) {
-        console.log("couldn't access DB")
-    }
-});
-
-// ### Express Config
-var bodyParser = require('body-parser');
-app.use(bodyParser.json());
-
-// ### fix CORS Problem on localhost
-app.use(allowCrossDomain);
-
-// ### create jwt
-/* ### remove on server!
-app.get('/jwt', function (req, res) {
-    var apijwt = jwt.sign("jwt4api", secretkey);
-    console.log(apijwt);
-    res.send(apijwt);
-});*/
-
-// ### only authorized access with jwt
-/*app.use(function (req, res, next) {
-    //var token = req.headers['x-access-token'];
-    var token = req.body.jwt;
+var authorize = function (req, res, next) {
+    var token = req.headers['jwt'];
     if (token) {
 
         // verifies secret and checks exp
-        jwt.verify(token, secretkey, function(err, decoded) {
+        jwt.verify(token, secretkey, function (err, decoded) {
             if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
+                return res.json({success: false, message: 'Failed to authenticate token.'});
             } else {
                 // if everything is good, save to request for use in other routes
                 req.jwtuser = decoded.user;
@@ -84,27 +62,188 @@ app.get('/jwt', function (req, res) {
         });
 
     }
-});*/
+};
+
+// ### NeDB connection
+db = new Datastore({filename: __dirname + '/DB/users.db'});
+db.loadDatabase(function (err) {
+    if (err) {
+        console.log("couldn't access DB")
+    }
+});
+
+//Database Functions
+var doesUserExist = function (username, callback) {
+    db.findOne({username: username}, function (err, docs) {
+        if (err) {
+            callback(err, false);
+        }
+        else if (docs === null) {
+            callback(false, false);
+        }
+        else {
+            callback(false, true);
+        }
+
+    });
+};
+var insertUser = function (user, callback) {
+    db.insert(user, function (err, newDoc) {
+        if (err) {
+            callback(err, newDoc);
+        }
+        else {
+            callback(false, newDoc);
+        }
+    });
+};
+var loginUser = function (user, callback) {
+    db.findOne({username: user.username}, function (err, docs) {
+        if (err) {
+            callback(err, false);
+        }
+        //user not found
+        else if (docs === null) {
+            callback(false, false);
+        }
+        //user found
+        else {
+            if (docs.password === user.password) {
+                callback(false, true);
+            }
+            else {
+                //wrong credentials
+                callback(false, false);
+            }
+        }
+
+    });
+};
+
+
+// ### Express Config
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
+// ### fix CORS Problem on localhost
+app.use(allowCrossDomain);
+
+// ### create jwt
+/* ### remove on server!
+ app.get('/jwt', function (req, res) {
+ var apijwt = jwt.sign("jwt4api", secretkey);
+ console.log(apijwt);
+ res.send(apijwt);
+ });*/
+
+
+
 
 // ### ROUTES --------------------------------------------------------------------------
 
 // POST new User
 app.post('/newUser', function (req, res) {
     var doc = req.body;
-
-    db.insert(doc, function (err, newDoc) {
-        if (err) {
-            console.log("error at DB insertion");
-            res.status(500).send('something broke!');
-        }
-        else {
-            console.log("Inserted new user in DB:");
-            console.log(newDoc);
-            console.log("\n");
-            res.send("ok");
-        }
-    });
+    var username = doc.username;
+    var password = doc.password;
+    if (username && password) {
+        var user = {
+            username: username,
+            password: password
+        };
+        doesUserExist(username, function (err, userExists) {
+            if (err) {
+                console.log("error at DB retrieval");
+                res.status(500).send('something broke!');
+            }
+            else if (userExists) {
+                res.status(403).send('User already exists');
+                console.log("User " + username + " already exists");
+            }
+            else {
+                insertUser(user, function (err, newDoc) {
+                    if (err) {
+                        console.log("error at DB insertion");
+                        res.status(500).send('something broke!');
+                    }
+                    else {
+                        console.log("Inserted new user in DB:");
+                        console.log(newDoc);
+                        console.log("\n");
+                        var payload = {username: username};
+                        var jwtUser = jwt.sign(payload, secretkey);
+                        res.status(200).send({jwt:jwtUser});
+                    }
+                })
+            }
+        });
+    }
+    else {
+        res.status(403).send('Username and password required');
+        console.log("Username and password is required");
+    }
 });
+
+//Check if user exists by username
+app.get('/checkUser/:username', function (req, res) {
+    var username = req.params.username;
+    if(username) {
+        doesUserExist(username, function (err, userExists) {
+            if (err) {
+                console.log("error at DB retrieval");
+                res.status(500).send('something broke!');
+            }
+            else if (userExists) {
+                res.status(210).send();
+                console.log("User " + username + " exists")
+            }
+            else {
+                res.status(220).send();
+                console.log("User " + username + " not found")
+            }
+        });
+    }
+    else{
+        res.status(403).send('Username is required');
+        console.log("Username is required");
+    }
+});
+
+//login user
+app.post('/loginUser', function (req, res) {
+    var doc = req.body;
+    var username = doc.username;
+    var password = doc.password;
+    if (username && password) {
+        var user = {
+            username: username,
+            password: password
+        };
+        loginUser(user, function (err, authSuccess) {
+            if (err) {
+                console.log("error at DB retrieval");
+                res.status(500).send('something broke!');
+            }
+            else if (authSuccess) {
+                var payload = {username: username};
+                var jwtUser = jwt.sign(payload, secretkey);
+                res.status(200).send({jwt:jwtUser});
+                console.log("User " + username + " logged in")
+            }
+            else {
+                res.status(403).send();
+                console.log("Wrong credentials")
+            }
+        });
+    }
+    else {
+        res.status(403).send('Username and password required');
+        console.log("Username and password is required");
+    }
+});
+
+// ### only authorized access with jwt
+//app.use(authorize);
 
 // GET location of user :id
 app.get('/getLocation/:id', function (req, res) {
@@ -151,28 +290,6 @@ app.post('/giveAccess', function (req, res) {
         else {
             console.log(doc);
             res.send("ok");
-        }
-    });
-});
-
-//Check if user exists by userid
-app.get('/checkUser/:id', function (req, res) {
-    var id = req.params.id;
-
-    db.findOne({id: id}, function (err, docs) {
-        if (err) {
-            console.log("error at DB retrieval");
-            res.status(500).send('something broke!');
-        }
-        else {
-            if (docs === null) {
-                res.send({"userExists": false});
-                console.log("User " + id + " not found")
-            }
-            else {
-                res.send({"userExists": true});
-                console.log("User " + id + " exists")
-            }
         }
     });
 });

@@ -1,31 +1,25 @@
 import {Component} from '@angular/core';
 import {NavController} from 'ionic-angular';
 import {BackendService} from "../../app/Services/backendService";
-import {Storage} from '@ionic/storage';
 import {LoginPage} from "../login/login";
 import {RegistrationPage} from "../registration/registration";
 
 @Component({
   selector: 'page-firststart',
   templateUrl: 'firststart.html',
-  providers: [BackendService, Storage]
+  providers: [BackendService]
 })
 export class FirststartPage {
-  public enteredUsr: string;
+  public enteredUser: string;
   public responseText: string;
 
   constructor(public navCtrl: NavController, private backendService: BackendService) {
   }
 
   clickNext() {
-    /*if (this.enteredUsr != null) {
-      // save entered user to local storage
-      localStorage.setItem("username", this.enteredUsr);
-      this.navCtrl.setRoot(HomePage);
-    }*/
-    if (this.enteredUsr) {
-      this.backendService.getCheckUser(this.enteredUsr).subscribe(
-        data => this.handleResponse(data, this.enteredUsr),
+    if (this.enteredUser) {
+      this.backendService.getCheckUser(this.enteredUser).subscribe(
+        response => this.handleResponse(response, this.enteredUser),
         error => console.log(error),
         () => console.log("Request Finished")
       );
@@ -35,12 +29,21 @@ export class FirststartPage {
     }
   }
 
-  private handleResponse(data, username) {
-    if (data.userExists) {
-      this.navCtrl.push(LoginPage);
+  private handleResponse(response, username) {
+    //210 => user exists
+    if (response === 210) {
+      this.navCtrl.push(LoginPage, {
+        newUsername: username
+      });
     }
-    else {
-      this.navCtrl.push(RegistrationPage);
+    //220 => user not found
+    else if(response === 220){
+      this.navCtrl.push(RegistrationPage, {
+        newUsername: username
+      });
+    }
+    else{
+      this.responseText = "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
     }
   }
 }
