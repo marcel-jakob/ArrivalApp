@@ -24,7 +24,7 @@ export class AddContactPage {
   public clickCheckContact() {
     if (this.enteredUser) {
       this.backendService.getCheckUser(this.enteredUser).subscribe(
-        data => this.handleResponse(data, this.enteredUser),
+        response => this.handleResponse(response, this.enteredUser),
         error => console.log(error),
         () => console.log("Request Finished")
       );
@@ -34,12 +34,17 @@ export class AddContactPage {
     }
   }
 
-  private handleResponse(data, username) {
-    if (data.userExists) {
-      this.addToContactlist(username)
+  private handleResponse(response, username) {
+    //210 => user exists
+    if (response === 210) {
+      this.addToContactlist(username);
     }
-    else {
+    //220 => user not found
+    else if(response === 220){
       this.responseText = "Kein Nutzer mit dem Namen " + this.enteredUser + " gefunden";
+    }
+    else{
+      this.responseText = "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
     }
   }
 
@@ -64,5 +69,4 @@ export class AddContactPage {
       }
     });
   }
-
 }

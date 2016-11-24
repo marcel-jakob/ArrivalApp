@@ -7,7 +7,7 @@ import {FirststartPage} from '../pages/firststart/firststart';
 import {AddContactPage} from "../pages/add-contact/add-contact";
 import {LoginPage} from "../../.tmp/pages/login/login";
 import {RegistrationPage} from "../../.tmp/pages/registration/registration";
-import {BackendService} from "./backendService";
+import {BackendService} from "./Services/backendService";
 import {Storage} from '@ionic/storage';
 
 
