@@ -5,6 +5,8 @@ import {HomePage} from '../pages/home/home';
 import {ContactsPage} from '../pages/contacts/contacts';
 import {FirststartPage} from '../pages/firststart/firststart';
 import {AddContactPage} from "../pages/add-contact/add-contact";
+import {LoginPage} from "../../.tmp/pages/login/login";
+import {RegistrationPage} from "../../.tmp/pages/registration/registration";
 import {BackendService} from "./backendService";
 import {Storage} from '@ionic/storage';
 
@@ -15,7 +17,9 @@ import {Storage} from '@ionic/storage';
     HomePage,
     ContactsPage,
     FirststartPage,
-    AddContactPage
+    AddContactPage,
+    LoginPage,
+    RegistrationPage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -26,7 +30,9 @@ import {Storage} from '@ionic/storage';
     HomePage,
     ContactsPage,
     FirststartPage,
-    AddContactPage
+    AddContactPage,
+    LoginPage,
+    RegistrationPage
   ],
   providers: [BackendService, Storage]
 })

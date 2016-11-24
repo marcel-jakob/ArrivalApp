@@ -3,6 +3,7 @@ import {NavController, Platform} from 'ionic-angular';
 import {ContactsPage} from '../contacts/contacts';
 import {FirststartPage} from '../firststart/firststart';
 import {Geolocation} from 'ionic-native';
+import {Storage} from '@ionic/storage';
 
 
 declare var google;
@@ -15,23 +16,21 @@ declare var google;
 export class HomePage {
 
   @ViewChild('map') mapElement: ElementRef;
-  map: any;
-  private platform: Platform;
+  private map: any;
   private marker: any;
 
-  constructor(public navCtrl: NavController, platform: Platform) {
+  constructor(public navCtrl: NavController, private platform: Platform, private storage: Storage) {
     this.platform = platform;
     this.loadMap();
 
-    if(!localStorage.getItem("username")) {
-      this.navCtrl.setRoot(FirststartPage);
-    }
-  }
-
-  ionViewDidLoad() {
-    if(localStorage.getItem("username")) {
-      console.log("username is: " + localStorage.getItem("username"));
-    }
+    this.storage.get('jwt').then((jwt) => {
+      if(!jwt){
+        this.navCtrl.setRoot(FirststartPage);
+      }
+      else{
+        console.log(jwt);
+      }
+    });
   }
 
   loadMap() {
