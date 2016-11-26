@@ -11,7 +11,7 @@ var authorization = function (req, res, next) {
                 return res.json({success: false, message: 'Failed to authenticate token.'});
             } else {
                 // if everything is good, save to request for use in other routes
-                req.jwtuser = decoded.user;
+                req.username = decoded.username;
                 next();
             }
         });
