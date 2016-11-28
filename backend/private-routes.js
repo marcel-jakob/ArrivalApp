@@ -4,6 +4,51 @@ var DBConnection = require('./db-connection');
 var jwt = require('jsonwebtoken');
 var secretkey = require("./secretkey").key;
 
+
+//GET give user access
+router.get('/giveAccess/:forId', function (req, res) {
+    var forId = req.params.forId;
+    DBConnection.doesUserExist(forId, function (err, userExists) {
+        if (err) {
+            console.log("error at DB retrieval");
+            res.status(500).send('something broke!');
+        }
+        else if (!userExists) {
+            res.status(404).send('User not found');
+        }
+        else {
+            DBConnection.giveAccess(req.username,forId, function(err, doc){
+                if (err) {
+                    console.log("error at DB update");
+                    res.status(500).send('something broke!');
+                }
+                else {
+                    if (doc) {
+                        res.status(200).send();
+                    }
+                    else {
+                        res.status(500).send('something broke! Nothing updated');
+                    }
+                }
+            });
+        }
+    });
+});
+// Upload User location
+router.post('/uploadLocation/', function (req, res) {
+    var doc = req.body;
+    var coordinates = doc;
+    DBConnection.saveLocation(req.username, coordinates, function (err) {
+        if (err) {
+            console.log("error at DB retrieval");
+            res.status(500).send('something broke!');
+        }
+        else {
+            res.send();
+        }
+    });
+});
+
 // GET location of user :id
 router.get('/getLocation/:id', function (req, res) {
     var id = req.params.id;
@@ -36,21 +81,5 @@ router.get('/getPushid/:id', function (req, res) {
     });
 });
 
-//POST give user access
-router.post('/giveAccess', function (req, res) {
-    var fromID = req.body.fromID;
-    var toID = req.body.toID;
-
-    db.update({id: fromID}, {$set: {access: toID}}, function (err, doc) {
-        if (err) {
-            console.log("error at DB update");
-            res.status(500).send('something broke!');
-        }
-        else {
-            console.log(doc);
-            res.send("ok");
-        }
-    });
-});
 
 module.exports = router;

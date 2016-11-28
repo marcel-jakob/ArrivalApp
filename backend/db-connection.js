@@ -1,5 +1,5 @@
 var Datastore = require('nedb');
-var DBConnection ={};
+var DBConnection = {};
 
 // ### NeDB connection
 db = new Datastore({filename: __dirname + '/DB/users.db'});
@@ -54,6 +54,17 @@ DBConnection.loginUser = function (user, callback) {
             }
         }
 
+    });
+};
+DBConnection.giveAccess = function (username, forId, callback) {
+    db.update({username: username}, {$set: {giveAccess: forId}}, function (err, doc) {
+        callback(err, doc);
+    });
+};
+DBConnection.saveLocation = function (username, coordinates, callback) {
+    db.update({username: username}, {$set: {coordinates: coordinates}}, function (err, doc) {
+        callback(err);
+        console.log("save location from " + username + ": " + doc);
     });
 };
 
