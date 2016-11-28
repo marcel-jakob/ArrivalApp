@@ -1,5 +1,5 @@
-import {NgModule} from '@angular/core';
-import {IonicApp, IonicModule} from 'ionic-angular';
+import {NgModule, ErrorHandler} from '@angular/core';
+import {IonicApp, IonicModule, IonicErrorHandler} from 'ionic-angular';
 import {MyApp} from './app.component';
 import {HomePage} from '../pages/home/home';
 import {ContactsPage} from '../pages/contacts/contacts';
@@ -34,7 +34,7 @@ import {Storage} from '@ionic/storage';
     LoginPage,
     RegistrationPage
   ],
-  providers: [BackendService, Storage]
+  providers: [BackendService, Storage, {provide: ErrorHandler, useClass: IonicErrorHandler}]
 })
 export class AppModule {
 }
