@@ -37,7 +37,7 @@ router.get('/giveAccess/:forId', function (req, res) {
 // Upload User location
 router.post('/uploadLocation/', function (req, res) {
     var doc = req.body;
-    var coordinates = doc;
+    var coordinates = doc.coordinates;
     DBConnection.saveLocation(req.username, coordinates, function (err) {
         if (err) {
             console.log("error at DB retrieval");
@@ -50,17 +50,36 @@ router.post('/uploadLocation/', function (req, res) {
 });
 
 // GET location of user :id
-router.get('/getLocation/:id', function (req, res) {
-    var id = req.params.id;
+router.get('/getLocations/', function (req, res) {
+    var username = req.username;
 
-    db.find({id: id}, function (err, docs) {
+    db.find({giveAccess: username}, function (err, docs) {
         if (err) {
-            console.log("error at DB retrieval");
-            res.status(500).send('something broke!');
+            console.log("ERROR: at DB retrieval");
+            res.status(500);
         }
         else {
-            var loc = docs[0].location;
-            res.send(loc);
+            // array of locations
+            var locs = [];
+
+            // only one location
+            var loc = {
+                username: null,
+                coordinates: null
+            };
+
+            for (var i in docs){
+                loc.username = docs[i].username;
+                loc.coordinates = docs[i].coordinates;
+
+                // push one location in locations array
+                locs.push(loc);
+
+                //asign new Object to loc
+                loc = {};
+            }
+            //return locations array
+            res.send(locs);
         }
     });
 });
