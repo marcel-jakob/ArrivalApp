@@ -35,7 +35,6 @@ export class BackendService {
     let body;
     if (res['_body']) {
       body = res.json();
-      console.log(body);
       return body || {};
     }
     else {

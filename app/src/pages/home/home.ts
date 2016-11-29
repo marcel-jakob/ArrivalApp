@@ -22,51 +22,52 @@ export class HomePage {
   private map: any;
   public notification: string;
 
-  constructor(public navCtrl: NavController, private platform: Platform, private storage: Storage, private backendService: BackendService) {
+  constructor(public navCtrl: NavController, private storage: Storage, private backendService: BackendService, private platform: Platform) {
     this.markers = [];
-    this.storage.get('jwt').then((jwt) => {
-      if(!jwt){
-        this.navCtrl.setRoot(FirststartPage);
-      }
-      else{
-        this.platform = platform;
-        this.loadMap();
-      }
+    this.platform.ready().then(() => {
+      this.init();
     });
   }
 
-  private loadMap() {
-    this.platform.ready().then(() => {
+  private init() {
+      this.storage.get('jwt').then((jwt) => {
+        console.log("stored token:");
+        console.log(jwt);
+        if (!jwt) {
+          this.navCtrl.setRoot(FirststartPage);
+        }
+        else {
+          this.updateLocation();
+        }
+      });
+  }
 
-      let locationOptions = {
-        timeout: 10000,
-        enableHighAccuracy: true
+  private updateLocation(){
+    let locationOptions = {
+      timeout: 10000,
+      enableHighAccuracy: true
+    };
+    Geolocation.getCurrentPosition(locationOptions).then((resp) => {
+      let position = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
+      let options = {
+        center: position,
+        zoom: 13,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
       };
 
-      Geolocation.getCurrentPosition(locationOptions).then((resp) => {
-        let position = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
-        let options = {
-          center: position,
-          zoom: 13,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-
-        this.map = new google.maps.Map(
-          this.mapElement.nativeElement,
-          options
-        );
-        var marker = new google.maps.Marker({
-          map: this.map,
-          animation: google.maps.Animation.DROP,
-          position: position
-        });
-        this.markers.push(marker);
-
-        this.getLocations();
-      }).catch((error) => {
-        console.log('Error getting location', error);
-      })
-
+      this.map = new google.maps.Map(
+        this.mapElement.nativeElement,
+        options
+      );
+      var marker = new google.maps.Marker({
+        map: this.map,
+        animation: google.maps.Animation.DROP,
+        position: position
+      });
+      this.markers.push(marker);
+      this.getLocations();
+    }).catch((error) => {
+      console.log('Error getting location', error);
     })
   }
 
@@ -77,24 +78,9 @@ export class HomePage {
       () => console.log("Request Finished")
     );
   }
-  private handleResponse(response){
-    /*response = [
-      {
-        "username":"Christoph",
-        "coordinates": {
-          "latitude": 48.865609,
-          "longitude": 9.187429
-        }
-      },{
-        "username":"Marcel",
-        "coordinates": {
-          "latitude": 48.863609,
-          "longitude": 9.187429
-        }
-      }
-    ];*/
-    console.log(response);
-    if(response) {
+
+  private handleResponse(response) {
+    if (response) {
       let position = new google.maps.LatLng(response[0].coordinates.latitude, response[0].coordinates.longitude);
       var marker = new google.maps.Marker({
         map: this.map,
@@ -103,18 +89,21 @@ export class HomePage {
       });
       this.markers.push(marker);
     }
-    else{
-      this.notification="Es sind keine Standorte für dich freigegeben.";
+    else {
+      this.notification = "Es sind keine Standorte für dich freigegeben.";
     }
   }
 
-  private handleError(error){
-    this.notification="Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
+  private handleError(error) {
+    this.notification = "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
     console.log(error);
   }
 
   public clickSendLocation() {
     this.navCtrl.push(ContactsPage);
+  }
+  public clickUpdateLocation() {
+    this.updateLocation();
   }
 
 }
