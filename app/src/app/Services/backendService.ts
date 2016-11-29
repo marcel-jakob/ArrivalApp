@@ -76,4 +76,8 @@ export class BackendService {
     let body = {coordinates: coords};
     return this.http.post(this.backendUrl + "uploadLocation/", body, this.options);
   }
+
+  public getLocations(){
+    return this.http.get(this.backendUrl + "getLocations/", this.options).map(this.extractData);
+  }
 }
