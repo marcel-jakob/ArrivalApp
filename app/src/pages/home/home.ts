@@ -78,7 +78,7 @@ export class HomePage {
     );
   }
   private handleResponse(response){
-    response = [
+    /*response = [
       {
         "username":"Christoph",
         "coordinates": {
@@ -92,15 +92,18 @@ export class HomePage {
           "longitude": 9.187429
         }
       }
-    ];
-    let position = new google.maps.LatLng(response[0].coordinates.latitude, response[0].coordinates.longitude);
-    var marker = new google.maps.Marker({
-      map: this.map,
-      animation: google.maps.Animation.DROP,
-      position: position
-    });
-    this.markers.push(marker);
-    if(!response){
+    ];*/
+    console.log(response);
+    if(response) {
+      let position = new google.maps.LatLng(response[0].coordinates.latitude, response[0].coordinates.longitude);
+      var marker = new google.maps.Marker({
+        map: this.map,
+        animation: google.maps.Animation.DROP,
+        position: position
+      });
+      this.markers.push(marker);
+    }
+    else{
       this.notification="Es sind keine Standorte für dich freigegeben.";
     }
   }
