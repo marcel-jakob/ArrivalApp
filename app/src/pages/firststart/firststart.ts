@@ -20,7 +20,7 @@ export class FirststartPage {
     if (this.enteredUser) {
       this.backendService.getCheckUser(this.enteredUser).subscribe(
         response => this.handleResponse(response, this.enteredUser),
-        error => console.log(error),
+        error => this.handleError(error),
         () => console.log("Request Finished")
       );
     }
@@ -45,5 +45,10 @@ export class FirststartPage {
     else{
       this.responseText = "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
     }
+  }
+
+  private handleError(error){
+    console.log("error");
+    console.log(error);
   }
 }

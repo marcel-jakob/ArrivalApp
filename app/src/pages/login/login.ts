@@ -22,6 +22,7 @@ export class LoginPage {
 
   constructor(public navCtrl: NavController, private backendService: BackendService, private navParams: NavParams, private storage: Storage) {
     this.newUsername = navParams.get("newUsername");
+    console.log("constructor login");
   }
 
   public clickLogin() {

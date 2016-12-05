@@ -7,7 +7,7 @@ import {Storage} from '@ionic/storage';
 import {BackendService} from "../../../.tmp/app/Services/backendService";
 
 
-declare var google;
+declare let google;
 
 @Component({
   selector: 'page-home',
@@ -31,18 +31,18 @@ export class HomePage {
 
   private init() {
       this.storage.get('jwt').then((jwt) => {
-        console.log("stored token:");
-        console.log(jwt);
         if (!jwt) {
           this.navCtrl.setRoot(FirststartPage);
+          console.log("no stored jwt, navigating to firststart");
         }
         else {
-          this.initLocation();
+          console.log("token is stored, staying on homepage");
+          this.updateLocation();
         }
       });
   }
 
-  private initLocation(){
+  private updateLocation(){
     let locationOptions = {
       timeout: 10000,
       enableHighAccuracy: true
@@ -59,7 +59,7 @@ export class HomePage {
         this.mapElement.nativeElement,
         options
       );
-      var marker = new google.maps.Marker({
+      let marker = new google.maps.Marker({
         map: this.map,
         animation: google.maps.Animation.DROP,
         position: position
@@ -81,13 +81,15 @@ export class HomePage {
 
   private handleResponse(response) {
     if (response) {
-      let position = new google.maps.LatLng(response[0].coordinates.latitude, response[0].coordinates.longitude);
-      var marker = new google.maps.Marker({
-        map: this.map,
-        animation: google.maps.Animation.DROP,
-        position: position
-      });
-      this.markers.push(marker);
+      for(let i=0;i<response.length;i++){
+        let position = new google.maps.LatLng(response[i].coordinates.latitude, response[i].coordinates.longitude);
+        let marker = new google.maps.Marker({
+          map: this.map,
+          animation: google.maps.Animation.DROP,
+          position: position
+        });
+        this.markers.push(marker);
+      }
     }
     else {
       this.notification = "Es sind keine Standorte für dich freigegeben.";
@@ -103,7 +105,7 @@ export class HomePage {
     this.navCtrl.push(ContactsPage);
   }
   public clickUpdateLocation() {
-    this.getLocations();
+    this.updateLocation();
   }
 
 }
