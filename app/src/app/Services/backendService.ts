@@ -11,20 +11,18 @@ export class BackendService {
   private options = new RequestOptions({headers: this.headers});
 
   constructor(private http: Http, private storage: Storage) {
-    console.log("constructor backend service");
-    console.log("before: " +this.jwt);
     this.updateJWT();
   }
 
-  private updateJWT() {
-    /*this.storage.get('jwt').then((jwt) => {
+  public updateJWT() {
+    this.storage.get('jwt').then((jwt) => {
       if (jwt) {
-        console.log("after: "+jwt);
         this.jwt = jwt;
         this.headers = new Headers({'Content-Type': 'application/json', "jwt": this.jwt});
         this.options = new RequestOptions({headers: this.headers});
+        console.log("jwt stored in backendService");
       }
-    });*/
+    });
   }
 
   //public routes
@@ -79,8 +77,6 @@ export class BackendService {
   }
 
   public getLocations(){
-    console.log(this.options);
-    console.log(this.jwt);
     return this.http.get(this.backendUrl + "getLocations/", this.options).map(this.extractData);
   }
 }

@@ -4,15 +4,14 @@ import {ContactsPage} from '../contacts/contacts';
 import {FirststartPage} from '../firststart/firststart';
 import {Geolocation} from 'ionic-native';
 import {Storage} from '@ionic/storage';
-import {BackendService} from "../../../.tmp/app/Services/backendService";
+import {BackendService} from "../../app/Services/backendService";
 
 
 declare let google;
 
 @Component({
   selector: 'page-home',
-  templateUrl: 'home.html',
-  providers: [BackendService, Storage]
+  templateUrl: 'home.html'
 })
 
 export class HomePage {
@@ -28,7 +27,9 @@ export class HomePage {
       this.init();
     });
   }
-
+  ionViewWillEnter() {
+    this.updateLocation();
+  }
   private init() {
       this.storage.get('jwt').then((jwt) => {
         if (!jwt) {

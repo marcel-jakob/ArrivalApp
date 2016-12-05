@@ -6,8 +6,7 @@ import {RegistrationPage} from "../registration/registration";
 
 @Component({
   selector: 'page-firststart',
-  templateUrl: 'firststart.html',
-  providers: [BackendService]
+  templateUrl: 'firststart.html'
 })
 export class FirststartPage {
   public enteredUser: string;
