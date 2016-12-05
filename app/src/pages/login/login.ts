@@ -12,8 +12,7 @@ import {Storage} from '@ionic/storage';
  */
 @Component({
   selector: 'page-login',
-  templateUrl: 'login.html',
-  providers: [Storage]
+  templateUrl: 'login.html'
 })
 export class LoginPage {
   public enteredPassword: string;
@@ -41,6 +40,7 @@ export class LoginPage {
     this.responseText = "Sie haben sich erfolgreich eingeloggt.";
     this.storage.set('jwt', data.jwt).then(() => {
       this.navCtrl.setRoot(HomePage);
+      this.backendService.updateJWT();
     });
   }
 

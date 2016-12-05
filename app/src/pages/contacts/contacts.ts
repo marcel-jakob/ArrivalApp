@@ -2,13 +2,12 @@ import {Component} from '@angular/core';
 import {NavController, ActionSheetController} from 'ionic-angular';
 import {AddContactPage} from '../add-contact/add-contact';
 import {Storage} from '@ionic/storage';
-import {BackendService} from "../../../.tmp/app/Services/backendService";
 import {LocationService} from "../../app/Services/locationService";
+import {BackendService} from "../../app/Services/backendService";
 
 @Component({
   selector: 'page-contacts',
-  templateUrl: 'contacts.html',
-  providers: [Storage, BackendService, LocationService]
+  templateUrl: 'contacts.html'
 })
 export class ContactsPage {
   public contacts: Array<any>;
@@ -18,7 +17,7 @@ export class ContactsPage {
   constructor(private locationService: LocationService, private navCtrl: NavController, private backendService: BackendService, private storage: Storage, private actionSheetCtrl: ActionSheetController) {
 
   }
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     this.storage.get('contacts').then((contactList) => {
       if (contactList) {
         this.contacts = contactList;

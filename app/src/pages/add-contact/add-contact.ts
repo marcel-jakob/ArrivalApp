@@ -11,8 +11,7 @@ import {Storage} from '@ionic/storage';
  */
 @Component({
   selector: 'page-add-contact',
-  templateUrl: 'add-contact.html',
-  providers: [BackendService, Storage]
+  templateUrl: 'add-contact.html'
 })
 export class AddContactPage {
   public enteredUser: any;

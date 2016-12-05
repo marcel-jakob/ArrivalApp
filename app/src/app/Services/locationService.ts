@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Geolocation} from 'ionic-native';
-import {BackendService} from "../../../.tmp/app/Services/backendService";
+import {BackendService} from "./backendService";
 
 @Injectable()
 export class LocationService {

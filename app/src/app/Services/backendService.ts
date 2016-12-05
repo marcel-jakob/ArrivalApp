@@ -12,15 +12,15 @@ export class BackendService {
 
   constructor(private http: Http, private storage: Storage) {
     this.updateJWT();
-
   }
 
-  private updateJWT() {
+  public updateJWT() {
     this.storage.get('jwt').then((jwt) => {
       if (jwt) {
         this.jwt = jwt;
         this.headers = new Headers({'Content-Type': 'application/json', "jwt": this.jwt});
         this.options = new RequestOptions({headers: this.headers});
+        console.log("jwt stored in backendService");
       }
     });
   }
@@ -40,7 +40,6 @@ export class BackendService {
     else {
       return {};
     }
-
   }
 
   public getCheckUser(id: any) {
@@ -75,5 +74,9 @@ export class BackendService {
   public uploadLocation(coords){
     let body = {coordinates: coords};
     return this.http.post(this.backendUrl + "uploadLocation/", body, this.options);
+  }
+
+  public getLocations(){
+    return this.http.get(this.backendUrl + "getLocations/", this.options).map(this.extractData);
   }
 }

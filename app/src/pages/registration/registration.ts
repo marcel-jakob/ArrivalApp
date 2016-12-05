@@ -12,8 +12,7 @@ import {HomePage} from "../home/home";
  */
 @Component({
   selector: 'page-registration',
-  templateUrl: 'registration.html',
-  providers: [BackendService, Storage]
+  templateUrl: 'registration.html'
 })
 export class RegistrationPage {
   public enteredPassword: string;
@@ -45,6 +44,7 @@ export class RegistrationPage {
     this.responseText = "Ein neuer Benutzer mit dem Namen " + username + " wurde angelegt.";
     this.storage.set('jwt', data.jwt).then(() => {
       this.navCtrl.setRoot(HomePage);
+      this.backendService.updateJWT();
     });
   }
 

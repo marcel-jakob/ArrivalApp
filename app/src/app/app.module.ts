@@ -9,6 +9,7 @@ import {LoginPage} from "../pages/login/login";
 import {RegistrationPage} from "../pages/registration/registration";
 import {BackendService} from "./Services/backendService";
 import {Storage} from '@ionic/storage';
+import {LocationService} from "./Services/locationService";
 
 
 @NgModule({
@@ -34,7 +35,7 @@ import {Storage} from '@ionic/storage';
     LoginPage,
     RegistrationPage
   ],
-  providers: [BackendService, Storage, {provide: ErrorHandler, useClass: IonicErrorHandler}]
+  providers: [LocationService, BackendService, Storage, {provide: ErrorHandler, useClass: IonicErrorHandler}]
 })
 export class AppModule {
 }
