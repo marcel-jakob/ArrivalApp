@@ -37,12 +37,12 @@ export class HomePage {
           this.navCtrl.setRoot(FirststartPage);
         }
         else {
-          this.updateLocation();
+          this.initLocation();
         }
       });
   }
 
-  private updateLocation(){
+  private initLocation(){
     let locationOptions = {
       timeout: 10000,
       enableHighAccuracy: true
@@ -103,7 +103,7 @@ export class HomePage {
     this.navCtrl.push(ContactsPage);
   }
   public clickUpdateLocation() {
-    this.updateLocation();
+    this.getLocations();
   }
 
 }
