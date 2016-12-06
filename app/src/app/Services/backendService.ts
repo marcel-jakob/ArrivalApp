@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
-import {Storage} from '@ionic/storage';
 
 @Injectable()
 export class BackendService {
@@ -10,20 +9,15 @@ export class BackendService {
   private headers = new Headers({'Content-Type': 'application/json'});
   private options = new RequestOptions({headers: this.headers});
 
-  constructor(private http: Http, private storage: Storage) {
-    this.updateJWT();
+  constructor(private http: Http) {
   }
 
-  public updateJWT() {
-    this.storage.get('jwt').then((jwt) => {
-      if (jwt) {
-        this.jwt = jwt;
-        this.headers = new Headers({'Content-Type': 'application/json', "jwt": this.jwt});
-        this.options = new RequestOptions({headers: this.headers});
-        console.log("jwt stored in backendService");
-      }
-    });
-  }
+  public saveJWT(jwt){
+    this.jwt = jwt;
+    this.headers = new Headers({'Content-Type': 'application/json', "jwt": this.jwt});
+    this.options = new RequestOptions({headers: this.headers});
+    console.log("jwt stored in backendService");
+  };
 
   //public routes
   public postNewUser(username: string, password: string) {
