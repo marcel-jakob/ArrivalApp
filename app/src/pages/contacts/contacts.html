@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Verfügbare Kontakte
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let contact of contacts" (click)="clickContact(contact.name)">
+      <ion-avatar item-left>
+        <img src="https://api.adorable.io/avatars/285/1.png">
+      </ion-avatar>
+      <ion-icon *ngIf="contact.name === giveAccessTo" name="locate"></ion-icon>
+      <h2>{{contact.name}}</h2>
+    </ion-item>
+  </ion-list>
+  {{notification}}
+
+  <ion-footer>
+    <ion-navbar>
+      <button ion-button full color="primary" (click)="clickAddContact()">hinzufügen</button>
+    </ion-navbar>
+  </ion-footer>
+</ion-content>

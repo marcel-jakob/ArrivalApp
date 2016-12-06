@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Erster Start
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <p>Bitte geben Sie Ihren bereits registrierten oder neuen eindeutigen Benutzername ein:</p>
+  <ion-item>
+    <ion-label floating>Benutzername</ion-label>
+    <ion-input type="text" [(ngModel)]="enteredUser"></ion-input>
+  </ion-item>
+  {{responseText}}
+  <button ion-button block id="next" (click)="clickNext()">weiter</button>
+</ion-content>

@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Login
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <p>Der Benutzername ist bereits vorhanden. Bitte loggen Sie sich ein:</p>
+  <ion-item>
+    <ion-label floating>Passwort</ion-label>
+    <ion-input type="password" [(ngModel)]="enteredPassword"></ion-input>
+  </ion-item>
+  {{responseText}}
+  <button ion-button block id="next" (click)="clickLogin()">login</button>
+</ion-content>
