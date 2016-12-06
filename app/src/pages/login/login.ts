@@ -29,18 +29,18 @@ export class LoginPage {
     }
     else {
       this.backendService.postLoginUser(this.newUsername, this.enteredPassword).subscribe(
-        data => this.handleResponse(data, this.newUsername),
+        data => this.handleResponse(data),
         error => this.handleError(error),
         () => console.log("Request Finished")
       );
     }
   }
 
-  private handleResponse(data, username) {
+  private handleResponse(data) {
     this.responseText = "Sie haben sich erfolgreich eingeloggt.";
+    this.backendService.saveJWT(data.jwt);
     this.storage.set('jwt', data.jwt).then(() => {
       this.navCtrl.setRoot(HomePage);
-      this.backendService.updateJWT();
     });
   }
 

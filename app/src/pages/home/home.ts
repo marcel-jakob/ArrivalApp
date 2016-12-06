@@ -23,27 +23,13 @@ export class HomePage {
 
   constructor(public navCtrl: NavController, private storage: Storage, private backendService: BackendService, private platform: Platform) {
     this.markers = [];
-    this.platform.ready().then(() => {
-      this.init();
-    });
   }
   ionViewWillEnter() {
     this.updateLocation();
   }
-  private init() {
-      this.storage.get('jwt').then((jwt) => {
-        if (!jwt) {
-          this.navCtrl.setRoot(FirststartPage);
-          console.log("no stored jwt, navigating to firststart");
-        }
-        else {
-          console.log("token is stored, staying on homepage");
-          this.updateLocation();
-        }
-      });
-  }
 
   private updateLocation(){
+    console.log("update location");
     let locationOptions = {
       timeout: 10000,
       enableHighAccuracy: true
@@ -91,6 +77,7 @@ export class HomePage {
         });
         this.markers.push(marker);
       }
+      this.notification = "In der Karte werden die für Sie freigegebenen Standorte angezeigt. Anzahl: " + response.length;
     }
     else {
       this.notification = "Es sind keine Standorte für dich freigegeben.";

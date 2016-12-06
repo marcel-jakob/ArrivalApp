@@ -30,7 +30,7 @@ export class RegistrationPage {
     }
     else if (this.enteredPassword === this.enteredPasswordAgain) {
       this.backendService.postNewUser(this.newUsername, this.enteredPassword).subscribe(
-        data => this.handleResponse(data, this.newUsername),
+        data => this.handleResponse(data),
         error => this.handleError(error),
         () => console.log("Request Finished")
       );
@@ -40,11 +40,11 @@ export class RegistrationPage {
     }
   }
 
-  private handleResponse(data, username) {
-    this.responseText = "Ein neuer Benutzer mit dem Namen " + username + " wurde angelegt.";
+  private handleResponse(data) {
+    this.responseText = "Ein neuer Benutzer wurde angelegt.";
+    this.backendService.saveJWT(data.jwt);
     this.storage.set('jwt', data.jwt).then(() => {
       this.navCtrl.setRoot(HomePage);
-      this.backendService.updateJWT();
     });
   }
 
