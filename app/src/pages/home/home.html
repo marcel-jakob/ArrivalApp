@@ -8,7 +8,52 @@
 
 <ion-content>
   <div #map id="map"></div>
-  {{notification}}
-  <button ion-button block (click)="clickSendLocation()">Standort senden</button>
-  <button ion-button block (click)="clickUpdateLocation()">Aktualisieren</button>
+
+  <ion-card *ngIf="warning" color="danger">
+    <ion-card-content>
+      {{warning}}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-content *ngIf="!sharedContacts.length">
+      Es ist kein Standort für Sie freigegeben.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="sharedContacts.length">
+    <ion-card-content>
+      Folgende Kontakte haben Ihren Standort für Sie freigegeben:
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngFor="let contact of sharedContacts">
+    <ion-card-header>
+      {{contact.name}}
+    </ion-card-header>
+    <ion-list>
+      <button *ngIf="contact.name !== giveAccessTo" ion-item (click)="giveAccess(contact.name)">
+        <ion-icon name="locate" item-left></ion-icon>
+        eigenen Standort senden
+      </button>
+      <button *ngIf="contact.name === giveAccessTo" ion-item (click)="giveAccess(contact.name)">
+        <ion-icon name="locate" item-left color="primary"></ion-icon>
+        Du teilst deinen Standort
+      </button>
+
+      <button *ngIf="!contact.info" ion-item (click)="clickMarker(contact)">
+        <ion-icon name="map" item-left></ion-icon>
+        Route berechnen
+      </button>
+
+      <button *ngIf="contact.info" ion-item (click)="clickMarker(contact)">
+        <ion-icon name="map" item-left color="primary"></ion-icon>
+        {{contact.info}}
+      </button>
+    </ion-list>
+  </ion-card>
+  <ion-navbar>
+    <button ion-button block (click)="clickUpdateLocation()">Aktualisieren</button>
+    <button ion-button block (click)="clickSendLocation()">Kontaktliste anzeigen</button>
+  </ion-navbar>
 </ion-content>

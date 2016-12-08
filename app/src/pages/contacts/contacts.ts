@@ -17,6 +17,7 @@ export class ContactsPage {
   constructor(private locationService: LocationService, private navCtrl: NavController, private backendService: BackendService, private storage: Storage, private actionSheetCtrl: ActionSheetController) {
 
   }
+
   ionViewWillEnter() {
     this.storage.get('contacts').then((contactList) => {
       if (contactList) {
@@ -37,42 +38,80 @@ export class ContactsPage {
     });
   }
 
-  clickAddContact() {
+  public clickAddContact() {
     this.navCtrl.push(AddContactPage);
   }
-  clickContact(contactName){
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'Kontakt: '+contactName,
-      buttons: [
+
+  public clickContact(contactName) {
+    let buttons;
+    if (this.giveAccessTo === contactName) {
+      buttons = [
+        {
+          text: 'Standort nicht mehr freigeben',
+          handler: () => {
+            this.removeAccess();
+          }
+        }, {
+          text: 'Abbrechen',
+          role: 'cancel'
+        }
+      ]
+    }
+    else {
+      buttons = [
         {
           text: 'Standort freigeben',
           handler: () => {
             this.giveAccess(contactName);
           }
-        },{
+        }, {
           text: 'Abbrechen',
           role: 'cancel'
         }
       ]
+    }
+    let actionSheet = this.actionSheetCtrl.create({
+      title: 'Kontakt: ' + contactName,
+      buttons: buttons
     });
     actionSheet.present();
   }
-  giveAccess(contactName){
+
+  private giveAccess(contactName) {
     this.backendService.giveAccess(contactName).subscribe(
-      response => this.handleResponse(contactName),
-      error => this.handleError(error),
+      response => this.handleGiveAccessResponse(contactName),
+      error => this.handleGiveAccessError(error),
       () => console.log("Request Finished")
     );
   }
 
-  handleResponse(contactName){
+  private handleGiveAccessResponse(contactName) {
     this.storage.set('giveAccessTo', contactName);
     this.giveAccessTo = contactName;
     this.locationService.upload();
   }
 
-  handleError(error){
+  private handleGiveAccessError(error) {
     console.log(error);
     this.notification = "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut";
   }
+
+  private removeAccess() {
+    this.backendService.removeAccess().subscribe(
+      response => this.handleRemoveAccessResponse(),
+      error => this.handleRemoveAccessError(error),
+      () => console.log("Request Finished")
+    );
+  }
+
+  private handleRemoveAccessResponse() {
+    this.storage.set('giveAccessTo', "");
+    this.giveAccessTo = "";
+  }
+
+  private handleRemoveAccessError(error) {
+    console.log(error);
+    this.notification = "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut";
+  }
+
 }
