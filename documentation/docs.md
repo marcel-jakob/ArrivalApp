@@ -26,7 +26,7 @@ Beim dem ersten Start der App wird eine seperate Seite angezeigt, in die man den
 Ist der Benutzername schon gespeichert, öffnet sich eine Seite, in die man seine Passwort eintragen muss.
 Wenn der Name noch nicht bekannt ist öffnet sich die Regestrierungs-Seite in der man ein neues Passwort wählen kann.
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">bla
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
 <img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
 <img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
 
@@ -41,3 +41,6 @@ Um seinen Standort freizugeben muss man in der Kontaktliste (wir durch den "Kont
 ##Besonderes
 
 ###Token für Backend Access
+Durch den token wird im Backend Zugriff auf die private routes gewährt. Er besteht aus einem geheimen key, um eine sichere Verbindung zu dem backend zu gewähren. Außerdem wird der username in verschlüsselter Form in dem token gespeichert, der von dem backend ausgelesen werden kann.
+
+Um also auf die private routes in dem backend zugriefen zu können, braucht man in jedem Fall den geheimen key.
