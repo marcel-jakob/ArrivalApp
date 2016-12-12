@@ -26,25 +26,25 @@ Beim dem ersten Start der App wird eine seperate Seite angezeigt, in die man den
 Ist der Benutzername schon gespeichert, öffnet sich eine Seite, in die man seine Passwort eintragen muss.
 Wenn der Name noch nicht bekannt ist öffnet sich die Regestrierungs-Seite in der man ein neues Passwort wählen kann.
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
 
 ###Neue Kontakte hinzufügen
 Um einen neuen User zu der Kontakliste hinzuzufügen muss im Hauptscreen zuerst auf den "Kontaktliste anzeigen"-Button drücken. Danach öffnet sich eine neue Seite, die die verfügbaren Kontakte anzeigt. Hier kann man jetzt entweder einen neuen Kontakt hinzufügen, oder man teilt direkt den Standort.
 
 Wenn man einen neuen Kontakt hinzufügen möchte, wird man dazu aufgefordert den entsprechenden Namen in eine Texteingabe zu schreiben. Sofern der User im backend bekannt ist, wird er zur Kontaktliste hinzugefügt.
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" wid
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
 
 ###Standort teilen
 Um seinen Standort freizugeben muss man in der Kontaktliste (wir durch den "Kontaktliste anzeigen"-Button im Hauptscreen geöffnet) einfach nur den ensprechenden Kontakt anklicken und im erscheinenden Kontextmenü auf "Standort freigeben drücken."
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" wid
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
 
 ##Besonderes
 
