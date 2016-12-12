@@ -27,6 +27,7 @@ Ist der Benutzername schon gespeichert, öffnet sich eine Seite, in die man sein
 Wenn der Name noch nicht bekannt ist öffnet sich die Regestrierungs-Seite in der man ein neues Passwort wählen kann.
 
 ![Sample Screenshot](https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png width="250")
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="250">
 
 ###Neue Kontakte hinzufügen
 
