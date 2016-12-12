@@ -32,28 +32,27 @@
       {{contact.name}}
     </ion-card-header>
     <ion-list>
-      <button *ngIf="contact.name !== giveAccessTo" ion-item (click)="giveAccess(contact.name)">
+      <button *ngIf="contact.name !== giveAccessTo" ion-item (click)="clickGiveAccess(contact.name)">
         <ion-icon name="locate" item-left></ion-icon>
         eigenen Standort senden
       </button>
-      <button *ngIf="contact.name === giveAccessTo" ion-item (click)="giveAccess(contact.name)">
+      <button *ngIf="contact.name === giveAccessTo" ion-item (click)="clickGiveAccess(contact.name)">
         <ion-icon name="locate" item-left color="primary"></ion-icon>
         Du teilst deinen Standort
       </button>
 
-      <button *ngIf="!contact.info" ion-item (click)="clickMarker(contact)">
+      <button *ngIf="!contact.info" ion-item (click)="clickContact(contact)">
         <ion-icon name="map" item-left></ion-icon>
         Route berechnen
       </button>
 
-      <button *ngIf="contact.info" ion-item (click)="clickMarker(contact)">
+      <button *ngIf="contact.info" ion-item (click)="clickContact(contact)">
         <ion-icon name="map" item-left color="primary"></ion-icon>
         {{contact.info}}
       </button>
     </ion-list>
   </ion-card>
   <ion-navbar>
-    <button ion-button block (click)="clickUpdateLocation()">Aktualisieren</button>
     <button ion-button block (click)="clickSendLocation()">Kontaktliste anzeigen</button>
   </ion-navbar>
 </ion-content>

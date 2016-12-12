@@ -18,7 +18,9 @@ export class BackendService {
     this.options = new RequestOptions({headers: this.headers});
   };
 
-  //public routes
+  /* =====================================
+   PUBLIC ROUTES
+   ===================================== */
   public postNewUser(username: string, password: string) {
     let body = {username: username, password: password};
     return this.http.post(this.backendUrl + "newUser/", body, this.options).map(this.extractData);
@@ -59,7 +61,9 @@ export class BackendService {
     return this.http.post(this.backendUrl + "loginUser/", body, this.options).map(this.extractData);
   }
 
-  //private routes
+  /* =====================================
+   PRIVATE ROUTE
+   ===================================== */
   public giveAccess(forId: string) {
     return this.http.get(this.backendUrl + "giveAccess/" + forId, this.options);
   }
