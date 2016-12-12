@@ -16,10 +16,11 @@ export class BackendService {
     this.jwt = jwt;
     this.headers = new Headers({'Content-Type': 'application/json', "jwt": this.jwt});
     this.options = new RequestOptions({headers: this.headers});
-    console.log("jwt stored in backendService");
   };
 
-  //public routes
+  /* =====================================
+   PUBLIC ROUTES
+   ===================================== */
   public postNewUser(username: string, password: string) {
     let body = {username: username, password: password};
     return this.http.post(this.backendUrl + "newUser/", body, this.options).map(this.extractData);
@@ -60,9 +61,15 @@ export class BackendService {
     return this.http.post(this.backendUrl + "loginUser/", body, this.options).map(this.extractData);
   }
 
-  //private routes
+  /* =====================================
+   PRIVATE ROUTE
+   ===================================== */
   public giveAccess(forId: string) {
     return this.http.get(this.backendUrl + "giveAccess/" + forId, this.options);
+  }
+
+  public removeAccess() {
+    return this.http.get(this.backendUrl + "removeAccess/", this.options);
   }
 
   public uploadLocation(coords){

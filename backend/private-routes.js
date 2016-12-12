@@ -34,6 +34,24 @@ router.get('/giveAccess/:forId', function (req, res) {
         }
     });
 });
+//GET remove user access
+router.get('/removeAccess/', function (req, res) {
+    var forId = "";
+    DBConnection.giveAccess(req.username, forId, function (err, doc) {
+        if (err) {
+            console.log("error at DB update");
+            res.status(500).send('something broke!');
+        }
+        else {
+            if (doc) {
+                res.status(200).send();
+            }
+            else {
+                res.status(500).send('something broke! Nothing updated');
+            }
+        }
+    });
+});
 // Upload User location
 router.post('/uploadLocation/', function (req, res) {
     var doc = req.body;
