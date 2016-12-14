@@ -6,7 +6,7 @@ import { Events } from 'ionic-angular';
 @Injectable()
 export class LocationService {
   private ownLocation;
-  private sharedContacts;
+  public sharedContacts;
 
   constructor ( private backendService: BackendService, private events: Events ) {
     this.sharedContacts = [];
@@ -62,7 +62,7 @@ export class LocationService {
     let notFound = true;
     for ( let i = 0; i < this.sharedContacts.length; i++ ) {
       //check if username is already in sharedContacts
-      if ( username === this.sharedContacts[ i ].name ) {
+      if ( username === this.sharedContacts[ i ].username ) {
         notFound = false;
         //check if position has changed
         if ( position.latitude != this.sharedContacts[ i ].position.latitude || position.longitude
@@ -71,7 +71,7 @@ export class LocationService {
           this.sharedContacts[ i ].position.latitude = position.latitude;
           this.sharedContacts[ i ].position.longitude = position.longitude;
           this.events.publish( 'userPosition:updated', {
-            user    : username,
+            username    : username,
             position: position
           } );
         }
@@ -80,11 +80,11 @@ export class LocationService {
     if ( notFound ) {
       //save new shared contact
       this.sharedContacts.push( {
-        name    : username,
+        username    : username,
         position: position
       } );
       this.events.publish( 'userPosition:new', {
-        user    : username,
+        username    : username,
         position: position
       } );
     }

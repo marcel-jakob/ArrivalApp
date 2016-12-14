@@ -25,6 +25,7 @@ export class HomePage {
   public sharedContacts: Array<any>;
 
   private ownMarker;
+  private contactsMarker;
   //google maps routing
   private directionsDisplay;
   private directionsService;
@@ -38,7 +39,8 @@ export class HomePage {
   constructor ( public navCtrl: NavController, private backendService: BackendService, private zone: NgZone,
                 private locationService: LocationService, private storage: Storage, private events: Events ) {
     //initialise the array for shared contacts
-    this.sharedContacts = [];
+    this.contactsMarker = [];
+    this.sharedContacts = locationService.sharedContacts;
     this.handleEvents();
   }
 
@@ -59,14 +61,14 @@ export class HomePage {
       } );
 
     //update positions and routes every 30 seconds
-    this.updateInterval = setInterval( () => {
-      this.updateLocation()
-    }, 20000 );
+    /*this.updateInterval = setInterval( () => {
+     this.updateLocation()
+     }, 20000 );*/
   }
 
   //this function is triggered before the home screen is leaved
   ionViewWillLeave () {
-    clearInterval( this.updateInterval );
+    //clearInterval( this.updateInterval );
   }
 
   public clickSendLocation () {
@@ -117,7 +119,7 @@ export class HomePage {
     this.initRoute();
 
     //update location of markers
-    this.updateLocation();
+    //this.updateLocation();
   }
 
   /* =====================================
@@ -274,6 +276,26 @@ export class HomePage {
           this.ownMarker.setPosition( gmapsPosition );
         }
       }
+    } );
+    this.events.subscribe( 'userPosition:new', ( userObject ) => {
+      let gmapsPosition = {
+        lat: userObject[ 0 ].position.latitude,
+        lng: userObject[ 0 ].position.longitude
+      };
+      console.log( "new user", userObject );
+      //create marker
+      let marker = new google.maps.Marker( {
+        map     : this.map,
+        position: gmapsPosition
+      } );
+      //push to marker array
+      this.contactsMarker.push( {
+        username: userObject[ 0 ].username,
+        marker  : marker
+      } );
+    } );
+    this.events.subscribe( 'userPosition:updated', ( userObject ) => {
+      console.log( "updated user", userObject );
     } );
   }
 
