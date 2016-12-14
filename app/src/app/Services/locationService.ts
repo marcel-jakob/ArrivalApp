@@ -90,4 +90,9 @@ export class LocationService {
     }
   }
 
+  /* ENHANCEMENT: compare and remove outdated contacts from list, otherwise the position will just stay the same
+  private cleanupSharedContacts(newList){
+
+  }*/
+
 }
