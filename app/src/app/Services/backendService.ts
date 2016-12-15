@@ -10,6 +10,7 @@ export class BackendService {
   private options = new RequestOptions({headers: this.headers});
 
   constructor(private http: Http) {
+
   }
 
   public saveJWT(jwt){
@@ -26,6 +27,43 @@ export class BackendService {
     return this.http.post(this.backendUrl + "newUser/", body, this.options).map(this.extractData);
   }
 
+  public getCheckUser(id: any) {
+    return this.http.get(this.backendUrl + "checkUser/" + id, this.options).map(this.extractStatusCode);
+  }
+
+  public postLoginUser(username: string, password: string) {
+    let body = {username: username, password: password};
+    return this.http.post(this.backendUrl + "loginUser/", body, this.options).map(this.extractData);
+  }
+
+  /* =====================================
+   PRIVATE ROUTE
+   ===================================== */
+  public giveAccessTo(forId: string) {
+    return this.http.get(this.backendUrl + "giveAccessTo/" + forId, this.options);
+  }
+
+  public removeAccess() {
+    return this.http.get(this.backendUrl + "removeAccess/", this.options);
+  }
+
+  public uploadLocation(coords){
+    let body = {coordinates: coords};
+    return this.http.post(this.backendUrl + "uploadLocation/", body, this.options);
+  }
+
+  public getLocations(){
+    return this.http.get(this.backendUrl + "getLocations/", this.options).map(this.extractData);
+  }
+
+  public getWhoDidIShare(){
+    return this.http.get(this.backendUrl + "whoDidIShare/", this.options).map(this.extractData);
+  }
+
+  /* =====================================
+   HELPER FUNCTIONS
+   ===================================== */
+
   private extractData(res: Response) {
     let body;
     if (res['_body']) {
@@ -35,10 +73,6 @@ export class BackendService {
     else {
       return {};
     }
-  }
-
-  public getCheckUser(id: any) {
-    return this.http.get(this.backendUrl + "checkUser/" + id, this.options).map(this.extractStatusCode);
   }
 
   private extractStatusCode(res: Response) {
@@ -54,30 +88,5 @@ export class BackendService {
       console.log("res");
       return 404
     }
-  }
-
-  public postLoginUser(username: string, password: string) {
-    let body = {username: username, password: password};
-    return this.http.post(this.backendUrl + "loginUser/", body, this.options).map(this.extractData);
-  }
-
-  /* =====================================
-   PRIVATE ROUTE
-   ===================================== */
-  public giveAccess(forId: string) {
-    return this.http.get(this.backendUrl + "giveAccess/" + forId, this.options);
-  }
-
-  public removeAccess() {
-    return this.http.get(this.backendUrl + "removeAccess/", this.options);
-  }
-
-  public uploadLocation(coords){
-    let body = {coordinates: coords};
-    return this.http.post(this.backendUrl + "uploadLocation/", body, this.options);
-  }
-
-  public getLocations(){
-    return this.http.get(this.backendUrl + "getLocations/", this.options).map(this.extractData);
   }
 }

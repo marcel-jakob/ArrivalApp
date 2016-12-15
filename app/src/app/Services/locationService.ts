@@ -5,15 +5,26 @@ import { Events } from 'ionic-angular';
 
 @Injectable()
 export class LocationService {
-  private ownLocation;
+  public ownLocation;
   public sharedContacts;
+  public giveAccessTo;
 
   constructor ( private backendService: BackendService, private events: Events ) {
     this.sharedContacts = [];
+    this.giveAccessTo = {};
     this.startWatching();
     this.watchSharedContacts();
+    this.whoDidIShare();
   }
 
+  public upload () {
+    this.backendService.uploadLocation( this.ownLocation )
+      .subscribe( data => console.log( "upload own location successfull" ), error => console.log( "Error", error ) );
+  }
+
+  /* =====================================
+   WATCH OWN LOCATION
+   ===================================== */
   private startWatching () {
     let locationOptions = {
       timeout           : 10000,
@@ -21,6 +32,7 @@ export class LocationService {
     };
     Geolocation.watchPosition( locationOptions )
       .subscribe( ( position: Geoposition ) => {
+        console.log( "own position changed" );
         this.ownLocation = {
           latitude : position.coords.latitude,
           longitude: position.coords.longitude
@@ -29,17 +41,15 @@ export class LocationService {
       } );
   }
 
-  public upload () {
-    this.backendService.uploadLocation( this.ownLocation )
-      .subscribe( error => console.log( error ), () => console.log( "Request Finished" ) );
-  }
-
+  /* =====================================
+   WATCH LOCATION OF SHARED CONTACTS
+   ===================================== */
   private watchSharedContacts () {
     setInterval( () => {
       this.backendService.getLocations()
         .subscribe( response => this.watchSharedContactsResponse( response ),
-          error => this.watchSharedContactsError( error ), () => console.log( "Get Locations Request Finished" ) );
-    }, 5000 );
+          error => this.watchSharedContactsError( error ) );
+    }, 10000 );
   }
 
   private watchSharedContactsResponse ( response ) {
@@ -58,6 +68,28 @@ export class LocationService {
     console.log( error );
   }
 
+  /* =====================================
+   ON FIRST LOAD: CHECK WHO HAS ACCESS TO MY LOCATION
+   ===================================== */
+
+  private whoDidIShare () {
+    this.backendService.getWhoDidIShare()
+      .subscribe( data => this.whoDidIShareResponse( data ), error => this.whoDidIShareError( error ) );
+  }
+
+  private whoDidIShareResponse ( response ) {
+    this.giveAccessTo.username = response.giveAccessTo;
+  }
+
+  private whoDidIShareError ( error ) {
+    this.giveAccessTo.username = "";
+    //this.warning = "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
+    console.log( error );
+  }
+
+  /* =====================================
+   HELPER FUNCTION TO CHECK IF LOCATION OF FRIENDS HAS CHANGED
+   ===================================== */
   private compareUsernameToSharedContacts ( username, position ) {
     let notFound = true;
     for ( let i = 0; i < this.sharedContacts.length; i++ ) {
@@ -71,7 +103,7 @@ export class LocationService {
           this.sharedContacts[ i ].position.latitude = position.latitude;
           this.sharedContacts[ i ].position.longitude = position.longitude;
           this.events.publish( 'userPosition:updated', {
-            username    : username,
+            username: username,
             position: position
           } );
         }
@@ -80,19 +112,17 @@ export class LocationService {
     if ( notFound ) {
       //save new shared contact
       this.sharedContacts.push( {
-        username    : username,
+        username: username,
         position: position
       } );
       this.events.publish( 'userPosition:new', {
-        username    : username,
+        username: username,
         position: position
       } );
     }
   }
 
   /* ENHANCEMENT: compare and remove outdated contacts from list, otherwise the position will just stay the same
-  private cleanupSharedContacts(newList){
-
-  }*/
+   private cleanupSharedContacts(newList){}*/
 
 }

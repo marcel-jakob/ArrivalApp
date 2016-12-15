@@ -1,7 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, Events } from 'ionic-angular';
-import { Storage } from '@ionic/storage';
-import { Geolocation } from 'ionic-native';
 import { BackendService } from "../../app/Services/backendService";
 import { NgZone } from '@angular/core';
 import { LocationService } from "../../app/Services/locationService";
@@ -19,85 +17,76 @@ export class HomePage {
   //Google Map
   @ViewChild( 'map' ) mapElement: ElementRef;
   private map: any;
-  //Warning Message
-  public warning: string;
-  //Array for shared contacts
+  //google maps routing
+  private directionsDisplay;
+  private directionsService;
+
+  //contact who has access to your location (from locationService)
+  private giveAccessTo;
+  //Array for shared contacts (from locationService)
   public sharedContacts: Array<any>;
 
   private ownMarker;
   private contactsMarker;
-  //google maps routing
-  private directionsDisplay;
-  private directionsService;
-  //username of contact who has access to your location
-  private giveAccessTo: string;
   //current route target
   private calculateRouteTo;
-  //intervall to update locations
-  private updateInterval;
+  //Warning Message
+  public warning: string;
 
   constructor ( public navCtrl: NavController, private backendService: BackendService, private zone: NgZone,
-                private locationService: LocationService, private storage: Storage, private events: Events ) {
+                private locationService: LocationService, private events: Events ) {
+
+
     //initialise the array for shared contacts
     this.contactsMarker = [];
+    this.calculateRouteTo = {};
     this.sharedContacts = locationService.sharedContacts;
+    this.giveAccessTo = locationService.giveAccessTo;
+  }
+
+  ionViewDidLoad () {
+    //initializing the map and updating it with the position of shared contacts
+    this.initMap();
+    //initialize routing
+    this.initRoute();
+
     this.handleEvents();
   }
 
-  //this function is triggered before the home screen is viewed
-  ionViewWillEnter () {
-
-    //initializing the map and updating it with the position of shared contacts
-    this.initMap();
-
-    //check if other page changed access to someone
-    this.storage.get( 'giveAccessTo' )
-      .then( ( accessTo ) => {
-        if ( accessTo ) {
-          this.giveAccessTo = accessTo;
-        } else {
-          this.giveAccessTo = "";
-        }
-      } );
-
-    //update positions and routes every 30 seconds
-    /*this.updateInterval = setInterval( () => {
-     this.updateLocation()
-     }, 20000 );*/
-  }
-
-  //this function is triggered before the home screen is leaved
-  ionViewWillLeave () {
-    //clearInterval( this.updateInterval );
-  }
-
-  public clickSendLocation () {
+  public clickShowContacts () {
     this.navCtrl.push( ContactsPage );
   }
 
-  public clickContact ( contact ) {
-    this.calculateRoute( this.ownMarker, contact );
-  }
-
   /* =====================================
-   GIVE ACCESS to contacts
+   GIVE OR REMOVE ACCESS to contacts
    ===================================== */
   public clickGiveAccess ( contactName ) {
-    this.backendService.giveAccess( contactName )
+    this.backendService.giveAccessTo( contactName )
       .subscribe( response => this.handleGiveAccessResponse( contactName ),
-        error => this.handleGiveAccessError( error ), () => console.log( "Request Finished" ) );
+        error => this.handleGiveAccessError( error ) );
   }
 
   private handleGiveAccessResponse ( contactName ) {
     //save who got access
-    this.storage.set( 'giveAccessTo', contactName );
-    this.giveAccessTo = contactName;
-
-    //updates markers (and routes)
-    this.updateLocation();
+    this.giveAccessTo.username = contactName;
   }
 
   private handleGiveAccessError ( error ) {
+    console.log( error );
+    this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
+  }
+
+  public clickRemoveAccess () {
+    this.backendService.removeAccess()
+      .subscribe( response => this.handleRemoveAccessResponse(), error => this.handleRemoveAccessError( error ) );
+  }
+
+  private handleRemoveAccessResponse () {
+    //save who got access
+    this.giveAccessTo.username = "";
+  }
+
+  private handleRemoveAccessError ( error ) {
     console.log( error );
     this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
   }
@@ -107,90 +96,16 @@ export class HomePage {
    ===================================== */
   //this function initializes the map
   private initMap () {
+    //map style
+    //let styles = [{"featureType":"all","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"},{"saturation":"-100"}]},{"featureType":"all","elementType":"labels.text.fill","stylers":[{"saturation":36},{"color":"#000000"},{"lightness":40},{"visibility":"off"}]},{"featureType":"all","elementType":"labels.text.stroke","stylers":[{"visibility":"off"},{"color":"#000000"},{"lightness":16}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":17},{"weight":1.2}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#4d6059"}]},{"featureType":"landscape","elementType":"geometry.stroke","stylers":[{"color":"#4d6059"}]},{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"color":"#4d6059"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"lightness":21}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#4d6059"}]},{"featureType":"poi","elementType":"geometry.stroke","stylers":[{"color":"#4d6059"}]},{"featureType":"road","elementType":"geometry","stylers":[{"visibility":"on"},{"color":"#7f8d89"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"},{"lightness":17}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#7f8d89"},{"lightness":29},{"weight":0.2}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":18}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":16}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.local","elementType":"geometry.stroke","stylers":[{"color":"#7f8d89"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":19}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#2b3638"},{"visibility":"on"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#2b3638"},{"lightness":17}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#24282b"}]},{"featureType":"water","elementType":"geometry.stroke","stylers":[{"color":"#24282b"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text.stroke","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.icon","stylers":[{"visibility":"off"}]}];
     //creating map
     let options = {
       zoom     : 14,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeId: google.maps.MapTypeId.ROADMAP/*,
+       styles: styles*/
     };
     this.map = new google.maps.Map( this.mapElement.nativeElement, options );
-
-
-    //initialize routing
-    this.initRoute();
-
-    //update location of markers
-    //this.updateLocation();
   }
-
-  /* =====================================
-   GETTING LOCATION (-> triggers calculating route and uploading location)
-   ===================================== */
-
-  //this function updates the own marker and triggers getting of other markers
-  private updateLocation () {
-    //this.resetMarker();
-
-    //get own location, set it to map center and create marker
-    let locationOptions = {
-      timeout           : 10000,
-      enableHighAccuracy: true
-    };
-    Geolocation.getCurrentPosition( locationOptions )
-      .then( ( resp ) => {
-        /*let position = new google.maps.LatLng( resp.coords.latitude, resp.coords.longitude );
-         this.map.setCenter( position );
-         this.ownMarker = new google.maps.Marker( {
-         map     : this.map,
-         position: position
-         } );*/
-
-        //get location of contacts
-        //this.getLocations();
-      } )
-      .catch( ( error ) => {
-        console.log( 'Error getting location', error );
-      } );
-  }
-
-  //this function gets the location of contacts from the backend
-  private getLocations () {
-    this.backendService.getLocations()
-      .subscribe( response => this.handleGetLocationsResponse( response ),
-        error => this.handleGetLocationsError( error ), () => console.log( "Get Locations Request Finished" ) );
-  }
-
-  private handleGetLocationsResponse ( response ) {
-    //clear array of old shared contacts
-    this.sharedContacts = [];
-    //fill array with shared contacts
-    for ( let i = 0; i < response.length; i++ ) {
-      let position = new google.maps.LatLng( response[ i ].coordinates.latitude, response[ i ].coordinates.longitude );
-      let marker = new google.maps.Marker( {
-        map     : this.map,
-        position: position
-      } );
-      this.sharedContacts.push( {
-        name  : response[ i ].username,
-        marker: marker
-      } );
-    }
-    //reset old warning
-    this.warning = "";
-    //start updating route
-    this.updateRoute();
-    //update new location
-    this.locationService.upload();
-  }
-
-  private handleGetLocationsError ( error ) {
-    this.warning = "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
-    console.log( error );
-  }
-
-
-  /* =====================================
-   CALCULATING ROUTE
-   ===================================== */
 
   private initRoute () {
     // Create a renderer for directions and bind it to the map.
@@ -200,22 +115,43 @@ export class HomePage {
     this.directionsService = new google.maps.DirectionsService;
   }
 
+
+  /* =====================================
+   CALCULATING ROUTE
+   ===================================== */
+
+  public clickCalculateRoute ( contact ) {
+    let toMarker;
+    let toContact;
+    //search the right marker
+    for ( let i = 0; i < this.contactsMarker.length; i++ ) {
+      if ( this.contactsMarker[ i ].username === contact.username ) {
+        toMarker = this.contactsMarker[ i ].marker;
+        toContact = this.contactsMarker[ i ].username;
+      }
+    }
+    if ( toMarker ) {
+      this.calculateRoute( this.ownMarker, toMarker );
+      this.calculateRouteTo.username = toContact;
+    } else {
+      console.log( "error calculating route, marker does not exist" );
+    }
+  }
+
   //this function calculates the route between two markers
-  private calculateRoute ( fromMarker, toContact ) {
-    this.resetMarker();
+  private calculateRoute ( fromMarker, toMarker ) {
+    //this.resetMarker();
 
     this.directionsService.route( {
       origin     : fromMarker.getPosition(),
-      destination: toContact.marker.getPosition(),
+      destination: toMarker.getPosition(),
       travelMode : google.maps.TravelMode.WALKING
     }, ( response, status ) => {
       if ( status === google.maps.DirectionsStatus.OK ) {
 
         //using zone to fix variables not updating (google service)
         this.zone.run( () => {
-
-          //store the active route
-          this.calculateRouteTo = toContact;
+          //store the active route information
           this.calculateRouteTo.info = response.routes[ 0 ].legs[ 0 ].distance.text + ' - '
             + response.routes[ 0 ].legs[ 0 ].duration.text;
         } );
@@ -228,61 +164,45 @@ export class HomePage {
     } );
   }
 
-  //this function recalculates the route if necessary
-  private updateRoute () {
-    if ( this.calculateRouteTo ) {
-      //show if calculateRoue to is in array of shared contacts
-      for ( let i = 0; i < this.sharedContacts.length; i++ ) {
-        if ( this.sharedContacts[ i ].name === this.calculateRouteTo.name ) {
-          this.calculateRoute( this.ownMarker, this.sharedContacts[ i ] );
-        }
-      }
-    }
-  }
-
-  //this function resets all marker from the map
-  private resetMarker () {
-    if ( this.ownMarker ) {
-      this.ownMarker.setMap( null );
-    }
-    for ( let i = 0; i < this.sharedContacts.length; i++ ) {
-      this.sharedContacts[ i ].marker.setMap( null );
-      this.sharedContacts[ i ].info = null;
-    }
-  }
-
 
   /* =====================================
    EVENTS
    ===================================== */
 
   private handleEvents () {
+
+    //own position updated
     this.events.subscribe( 'ownPosition:updated', ( ownLocation ) => {
       let gmapsPosition = {
         lat: ownLocation[ 0 ].latitude,
         lng: ownLocation[ 0 ].longitude
       };
-      if ( this.map ) {
-        if ( !this.ownMarker ) {
-          //create new marker
-          this.map.setCenter( gmapsPosition );
-          this.ownMarker = new google.maps.Marker( {
-            map     : this.map,
-            position: gmapsPosition
-          } );
-        } else {
-          //update marker position
-          this.map.setCenter( gmapsPosition );
-          this.ownMarker.setPosition( gmapsPosition );
-        }
+      if ( !this.ownMarker ) {
+        //create new marker
+        this.map.setCenter( gmapsPosition );
+        this.ownMarker = new google.maps.Marker( {
+          map     : this.map,
+          position: gmapsPosition
+        } );
+      } else {
+        //update marker position
+        this.map.setCenter( gmapsPosition );
+        this.ownMarker.setPosition( gmapsPosition );
       }
+
     } );
+
+    this.events.subscribe( 'ownPosition:updated', () => {
+      this.locationService.upload();
+    } );
+
+    //new users position
     this.events.subscribe( 'userPosition:new', ( userObject ) => {
       let gmapsPosition = {
         lat: userObject[ 0 ].position.latitude,
         lng: userObject[ 0 ].position.longitude
       };
-      console.log( "new user", userObject );
+      console.log( "new marker added" );
       //create marker
       let marker = new google.maps.Marker( {
         map     : this.map,
@@ -294,9 +214,32 @@ export class HomePage {
         marker  : marker
       } );
     } );
+
+    //users position updated
     this.events.subscribe( 'userPosition:updated', ( userObject ) => {
-      console.log( "updated user", userObject );
+      console.log( "marker position updated" );
     } );
   }
+
+  /* =====================================
+   TODO
+   ===================================== */
+
+  //TODO: loading contacts notification (like errors)
+  //TODO: delete route
+  //TODO: event with warnings/errors
+  //TODO: GMAP FUNCTIONS to service
+  //TODO: recalculate route
+  // this function recalculates the route if necessary
+  /* private updateRoute () {
+   if ( this.calculateRouteTo ) {
+   //show if calculateRoue to is in array of shared contacts
+   for ( let i = 0; i < this.sharedContacts.length; i++ ) {
+   if ( this.sharedContacts[ i ].name === this.calculateRouteTo.name ) {
+   this.calculateRoute( this.ownMarker, this.sharedContacts[ i ] );
+   }
+   }
+   }
+   }*/
 
 }
