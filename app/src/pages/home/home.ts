@@ -31,7 +31,8 @@ export class HomePage {
   //current route target
   private calculateRouteTo;
   //Warning Message
-  public warning: string;
+  public notification;
+  private resetNotificationTimer;
 
   constructor ( public navCtrl: NavController, private backendService: BackendService, private zone: NgZone,
                 private locationService: LocationService, private events: Events ) {
@@ -40,8 +41,10 @@ export class HomePage {
     //initialise the array for shared contacts
     this.contactsMarker = [];
     this.calculateRouteTo = {};
+    this.notification = {};
     this.sharedContacts = locationService.sharedContacts;
     this.giveAccessTo = locationService.giveAccessTo;
+
   }
 
   ionViewDidLoad () {
@@ -51,6 +54,7 @@ export class HomePage {
     this.initRoute();
 
     this.handleEvents();
+
   }
 
   public clickShowContacts () {
@@ -73,7 +77,10 @@ export class HomePage {
 
   private handleGiveAccessError ( error ) {
     console.log( error );
-    this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
   }
 
   public clickRemoveAccess () {
@@ -88,7 +95,10 @@ export class HomePage {
 
   private handleRemoveAccessError ( error ) {
     console.log( error );
-    this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Deaktivierung der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
   }
 
   /* =====================================
@@ -134,7 +144,11 @@ export class HomePage {
       this.calculateRoute( this.ownMarker, toMarker );
       this.calculateRouteTo.username = toContact;
     } else {
-      console.log( "error calculating route, marker does not exist" );
+      this.events.publish( "userNotification", {
+        text : "Es ist ein Fehler bei der Routenberechnung aufgetreten. Der Marker des ausgewählten Kontakts existiert nicht."
+        + status,
+        color: "danger"
+      } );
     }
   }
 
@@ -159,9 +173,30 @@ export class HomePage {
         //show the route
         this.directionsDisplay.setDirections( response );
       } else {
-        this.warning = 'Directions request failed due to ' + status;
+        this.events.publish( "userNotification", {
+          text : "Es ist ein Fehler bei der Routenberechnung aufgetreten. Bitte versuchen Sie es erneut:" + status,
+          color: "danger"
+        } );
       }
     } );
+  }
+
+  /* =====================================
+   NOTIFICATIONS
+   ===================================== */
+
+  private resetNotifications () {
+    //make sure that timeout is cleared if there is an active one
+    if(this.resetNotificationTimer){
+      clearTimeout(this.resetNotificationTimer);
+    }
+    this.resetNotificationTimer= setTimeout(()=>{
+      this.resetNotificationTimer=null;
+      this.events.publish( "userNotification", {
+        text : "",
+        color: ""
+      } );
+    },10000);
   }
 
 
@@ -219,6 +254,14 @@ export class HomePage {
     this.events.subscribe( 'userPosition:updated', ( userObject ) => {
       console.log( "marker position updated" );
     } );
+
+    //new user notification
+    this.events.subscribe( 'userNotification', ( notificationObject ) => {
+      this.resetNotifications();
+      this.notification.text = notificationObject[ 0 ].text;
+      //colors: danger->red, primary->blue, secondary->green, default->white
+      this.notification.color = notificationObject[ 0 ].color;
+    } );
   }
 
   /* =====================================
@@ -227,7 +270,6 @@ export class HomePage {
 
   //TODO: loading contacts notification (like errors)
   //TODO: delete route
-  //TODO: event with warnings/errors
   //TODO: GMAP FUNCTIONS to service
   //TODO: recalculate route
   // this function recalculates the route if necessary

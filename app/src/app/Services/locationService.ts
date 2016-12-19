@@ -64,8 +64,12 @@ export class LocationService {
   }
 
   private watchSharedContactsError ( error ) {
-    //this.warning = "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
+    //this.notification = "";
     console.log( error );
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
   }
 
   /* =====================================
@@ -83,8 +87,11 @@ export class LocationService {
 
   private whoDidIShareError ( error ) {
     this.giveAccessTo.username = "";
-    //this.warning = "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
     console.log( error );
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Kommunikation mit dem Server aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
   }
 
   /* =====================================

@@ -9,9 +9,9 @@
 <ion-content>
   <div #map id="map"></div>
 
-  <ion-card *ngIf="warning" color="danger">
+  <ion-card *ngIf="notification.text" color="{{notification.color}}">
     <ion-card-content>
-      {{warning}}
+      {{notification.text}}
     </ion-card-content>
   </ion-card>
 

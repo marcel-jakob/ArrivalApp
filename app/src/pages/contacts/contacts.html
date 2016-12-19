@@ -8,6 +8,11 @@
 
 <ion-content>
   <ion-list>
+    <ion-item *ngIf="!contacts">
+      <h2>Keine Kontakte gefunden.</h2>
+    </ion-item>
+  </ion-list>
+  <ion-list>
     <ion-item *ngFor="let contact of contacts" (click)="clickContact(contact.username)">
       <ion-avatar item-left>
         <img src="https://api.adorable.io/avatars/285/1.png">
@@ -16,7 +21,6 @@
       <h2>{{contact.username}}</h2>
     </ion-item>
   </ion-list>
-  {{warning}}
 
   <ion-footer>
     <ion-navbar>
