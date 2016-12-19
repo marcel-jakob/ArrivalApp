@@ -32,6 +32,7 @@ export class ContactsPage {
 
   public clickContact ( contactName ) {
     let buttons;
+    //show input dialog whether give or remove access
     if ( this.giveAccessTo.username === contactName ) {
       buttons = [
         {

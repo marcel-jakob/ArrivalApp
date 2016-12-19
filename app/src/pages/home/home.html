@@ -17,7 +17,7 @@
 
   <ion-card>
     <ion-card-content *ngIf="!sharedContacts.length">
-      Es ist kein Standort für Sie freigegeben.
+      Es ist kein Standort für Sie freigegeben oder diese werden gerade geladen. Bitte warten Sie einen Moment.
     </ion-card-content>
   </ion-card>
 
@@ -46,7 +46,7 @@
         Route berechnen
       </button>
 
-      <button *ngIf="contact.username === calculateRouteTo.username" ion-item (click)="clickCalculateRoute(contact)">
+      <button *ngIf="contact.username === calculateRouteTo.username" ion-item (click)="clickStopRouting()">
         <ion-icon name="map" item-left color="primary"></ion-icon>
         {{calculateRouteTo.info}}
       </button>

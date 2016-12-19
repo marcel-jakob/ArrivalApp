@@ -32,12 +32,19 @@ export class LocationService {
     };
     Geolocation.watchPosition( locationOptions )
       .subscribe( ( position: Geoposition ) => {
-        console.log( "own position changed" );
-        this.ownLocation = {
-          latitude : position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-        this.events.publish( 'ownPosition:updated', this.ownLocation );
+        console.log( "own position changed", position );
+        if ( position.coords ) {
+          this.ownLocation = {
+            latitude : position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          this.events.publish( 'ownPosition:updated', this.ownLocation );
+        } else {
+          this.events.publish( "userNotification", {
+            text : "Es ist ein Fehler bei der Standortabfrage aufgetreten. Bitte überprüfen Sie Ihre Einstellungen und versuchen Sie es erneut.",
+            color: "danger"
+          } );
+        }
       } );
   }
 
@@ -45,11 +52,13 @@ export class LocationService {
    WATCH LOCATION OF SHARED CONTACTS
    ===================================== */
   private watchSharedContacts () {
-    setInterval( () => {
-      this.backendService.getLocations()
-        .subscribe( response => this.watchSharedContactsResponse( response ),
-          error => this.watchSharedContactsError( error ) );
-    }, 10000 );
+    this.backendService.getLocations()
+      .subscribe( response => this.watchSharedContactsResponse( response ),
+        error => this.watchSharedContactsError( error ) );
+
+    setTimeout( () => {
+      this.watchSharedContacts();
+    }, 5000 );
   }
 
   private watchSharedContactsResponse ( response ) {
@@ -128,8 +137,5 @@ export class LocationService {
       } );
     }
   }
-
-  /* ENHANCEMENT: compare and remove outdated contacts from list, otherwise the position will just stay the same
-   private cleanupSharedContacts(newList){}*/
 
 }

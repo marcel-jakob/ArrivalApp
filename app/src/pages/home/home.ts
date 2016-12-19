@@ -130,6 +130,11 @@ export class HomePage {
    CALCULATING ROUTE
    ===================================== */
 
+  public clickStopRouting () {
+    this.directionsDisplay.setMap( null );
+    this.calculateRouteTo.username = null;
+  }
+
   public clickCalculateRoute ( contact ) {
     let toMarker;
     let toContact;
@@ -154,8 +159,6 @@ export class HomePage {
 
   //this function calculates the route between two markers
   private calculateRoute ( fromMarker, toMarker ) {
-    //this.resetMarker();
-
     this.directionsService.route( {
       origin     : fromMarker.getPosition(),
       destination: toMarker.getPosition(),
@@ -171,6 +174,7 @@ export class HomePage {
         } );
 
         //show the route
+        this.directionsDisplay.setMap( this.map );
         this.directionsDisplay.setDirections( response );
       } else {
         this.events.publish( "userNotification", {
@@ -187,16 +191,16 @@ export class HomePage {
 
   private resetNotifications () {
     //make sure that timeout is cleared if there is an active one
-    if(this.resetNotificationTimer){
-      clearTimeout(this.resetNotificationTimer);
+    if ( this.resetNotificationTimer ) {
+      clearTimeout( this.resetNotificationTimer );
     }
-    this.resetNotificationTimer= setTimeout(()=>{
-      this.resetNotificationTimer=null;
+    this.resetNotificationTimer = setTimeout( () => {
+      this.resetNotificationTimer = null;
       this.events.publish( "userNotification", {
         text : "",
         color: ""
       } );
-    },10000);
+    }, 10000 );
   }
 
 
@@ -268,10 +272,8 @@ export class HomePage {
    TODO
    ===================================== */
 
-  //TODO: loading contacts notification (like errors)
-  //TODO: delete route
+  //TODO: userPosition:updated -> marker position and recalculate route
   //TODO: GMAP FUNCTIONS to service
-  //TODO: recalculate route
   // this function recalculates the route if necessary
   /* private updateRoute () {
    if ( this.calculateRouteTo ) {
@@ -283,5 +285,12 @@ export class HomePage {
    }
    }
    }*/
+
+  /* ENHANCEMENT:
+   - compare and remove outdated contacts from shared contacts list,
+   otherwise the position will just stay the same if they stop sharing their position
+   - Show a loading bar and/or wait till contacts are loaded before removing the Splashscreen
+   */
+
 
 }
