@@ -256,6 +256,20 @@ export class HomePage {
 
     //users position updated
     this.events.subscribe( 'userPosition:updated', ( userObject ) => {
+      let gmapsPosition = {
+        lat: userObject[ 0 ].position.latitude,
+        lng: userObject[ 0 ].position.longitude
+      };
+      for ( let i = 0; i < this.contactsMarker.length; i++ ) {
+        //select the marker for this user
+        if ( this.contactsMarker[ i ].username === userObject[ 0 ].username ) {
+          this.contactsMarker[ i ].marker.setPosition( gmapsPosition );
+          //if this user is also the current "Route-User"
+          if ( this.calculateRouteTo.username === userObject[ 0 ].username ) {
+            this.calculateRoute( this.ownMarker, this.contactsMarker[ i ].marker );
+          }
+        }
+      }
       console.log( "marker position updated" );
     } );
 
@@ -272,25 +286,14 @@ export class HomePage {
    TODO
    ===================================== */
 
-  //TODO: userPosition:updated -> marker position and recalculate route
   //TODO: GMAP FUNCTIONS to service
-  // this function recalculates the route if necessary
-  /* private updateRoute () {
-   if ( this.calculateRouteTo ) {
-   //show if calculateRoue to is in array of shared contacts
-   for ( let i = 0; i < this.sharedContacts.length; i++ ) {
-   if ( this.sharedContacts[ i ].name === this.calculateRouteTo.name ) {
-   this.calculateRoute( this.ownMarker, this.sharedContacts[ i ] );
-   }
-   }
-   }
-   }*/
+
 
   /* ENHANCEMENT:
    - compare and remove outdated contacts from shared contacts list,
    otherwise the position will just stay the same if they stop sharing their position
    - Show a loading bar and/or wait till contacts are loaded before removing the Splashscreen
-   */
+  */
 
 
 }
