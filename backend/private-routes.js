@@ -6,7 +6,7 @@ var secretkey = require("./secretkey").key;
 
 
 //GET give user access
-router.get('/giveAccess/:forId', function (req, res) {
+router.get('/giveAccessTo/:forId', function (req, res) {
     var forId = req.params.forId;
     DBConnection.doesUserExist(forId, function (err, userExists) {
         if (err) {
@@ -17,7 +17,7 @@ router.get('/giveAccess/:forId', function (req, res) {
             res.status(404).send('User not found');
         }
         else {
-            DBConnection.giveAccess(req.username,forId, function(err, doc){
+            DBConnection.giveAccessTo(req.username,forId, function( err, doc){
                 if (err) {
                     console.log("error at DB update");
                     res.status(500).send('something broke!');
@@ -37,7 +37,7 @@ router.get('/giveAccess/:forId', function (req, res) {
 //GET remove user access
 router.get('/removeAccess/', function (req, res) {
     var forId = "";
-    DBConnection.giveAccess(req.username, forId, function (err, doc) {
+    DBConnection.giveAccessTo(req.username, forId, function ( err, doc) {
         if (err) {
             console.log("error at DB update");
             res.status(500).send('something broke!');
@@ -69,40 +69,56 @@ router.post('/uploadLocation/', function (req, res) {
 
 // GET location of user :id
 router.get('/getLocations/', function (req, res) {
-    var username = req.username;
+  var username = req.username;
 
-    db.find({giveAccess: username}, function (err, docs) {
-        if (err) {
-            console.log("ERROR: at DB retrieval");
-            res.status(500);
-        }
-        else {
-            // array of locations
-            var locs = [];
+  DBConnection.getUserLocation(username, function (err, doc) {
+    if (err) {
+      console.log("ERROR: at DB retrieval");
+      res.status(500);
+    }
+    else {
+      // array of locations
+      var locations = [];
+      var location;
 
-            // only one location
-            var loc = {
-                username: null,
-                coordinates: null
-            };
+      for (var i in doc){
+        location = {};
+        location.username = doc[i].username;
+        location.coordinates = doc[i].coordinates;
 
-            for (var i in docs){
-                loc.username = docs[i].username;
-                loc.coordinates = docs[i].coordinates;
-
-                // push one location in locations array
-                locs.push(loc);
-
-                //asign new Object to loc
-                loc = {};
-            }
-            //return locations array
-            res.send(locs);
-        }
-    });
+        // push one location in locations array
+        locations.push(location);
+      }
+      //return locations array
+      res.send(locations);
+    }
+  });
 });
 
-//GET one user by id
+// GET location of user :id
+router.get('/whoDidIShare/', function (req, res) {
+  console.log("get whodidishare");
+  var username = req.username;
+
+  DBConnection.whoDidIShare(username, function (err, doc) {
+    if (err) {
+      console.log("ERROR: at DB retrieval");
+      res.status(500);
+    }
+    else {
+      var sharedContact;
+      if(doc!=null){
+        sharedContact=doc[0].giveAccessTo;
+      }
+      else{
+        sharedContact=null;
+      }
+      res.send({giveAccessTo: sharedContact});
+    }
+  });
+});
+
+/*GET one user by id
 router.get('/getPushid/:id', function (req, res) {
     var id = req.params.id;
 
@@ -116,7 +132,7 @@ router.get('/getPushid/:id', function (req, res) {
             res.send(pushid);
         }
     });
-});
+});*/
 
 
 module.exports = router;

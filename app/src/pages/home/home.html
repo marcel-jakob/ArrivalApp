@@ -29,30 +29,30 @@
 
   <ion-card *ngFor="let contact of sharedContacts">
     <ion-card-header>
-      {{contact.name}}
+      {{contact.username}}
     </ion-card-header>
     <ion-list>
-      <button *ngIf="contact.name !== giveAccessTo" ion-item (click)="clickGiveAccess(contact.name)">
+      <button *ngIf="contact.username != giveAccessTo.username" ion-item (click)="clickGiveAccess(contact.username)">
         <ion-icon name="locate" item-left></ion-icon>
         eigenen Standort senden
       </button>
-      <button *ngIf="contact.name === giveAccessTo" ion-item (click)="clickGiveAccess(contact.name)">
+      <button *ngIf="contact.username === giveAccessTo.username" ion-item (click)="clickRemoveAccess()">
         <ion-icon name="locate" item-left color="primary"></ion-icon>
         Du teilst deinen Standort
       </button>
 
-      <button *ngIf="!contact.info" ion-item (click)="clickContact(contact)">
+      <button *ngIf="contact.username != calculateRouteTo.username" ion-item (click)="clickCalculateRoute(contact)">
         <ion-icon name="map" item-left></ion-icon>
         Route berechnen
       </button>
 
-      <button *ngIf="contact.info" ion-item (click)="clickContact(contact)">
+      <button *ngIf="contact.username === calculateRouteTo.username" ion-item (click)="clickCalculateRoute(contact)">
         <ion-icon name="map" item-left color="primary"></ion-icon>
-        {{contact.info}}
+        {{calculateRouteTo.info}}
       </button>
     </ion-list>
   </ion-card>
   <ion-navbar>
-    <button ion-button block (click)="clickSendLocation()">Kontaktliste anzeigen</button>
+    <button ion-button block (click)="clickShowContacts()">Kontaktliste anzeigen</button>
   </ion-navbar>
 </ion-content>

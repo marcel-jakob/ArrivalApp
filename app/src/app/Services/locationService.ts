@@ -1,26 +1,128 @@
-import {Injectable} from '@angular/core';
-import {Geolocation} from 'ionic-native';
-import {BackendService} from "./backendService";
+import { Injectable } from '@angular/core';
+import { Geolocation, Geoposition } from 'ionic-native';
+import { BackendService } from "./backendService";
+import { Events } from 'ionic-angular';
 
 @Injectable()
 export class LocationService {
+  public ownLocation;
+  public sharedContacts;
+  public giveAccessTo;
 
-  constructor(private backendService: BackendService) {
+  constructor ( private backendService: BackendService, private events: Events ) {
+    this.sharedContacts = [];
+    this.giveAccessTo = {};
+    this.startWatching();
+    this.watchSharedContacts();
+    this.whoDidIShare();
   }
 
-  public upload() {
+  public upload () {
+    this.backendService.uploadLocation( this.ownLocation )
+      .subscribe( data => console.log( "upload own location successfull" ), error => console.log( "Error", error ) );
+  }
+
+  /* =====================================
+   WATCH OWN LOCATION
+   ===================================== */
+  private startWatching () {
     let locationOptions = {
-      timeout: 10000,
+      timeout           : 10000,
       enableHighAccuracy: true
     };
-    Geolocation.getCurrentPosition(locationOptions).then((resp) => {
-      this.backendService.uploadLocation({latitude: resp.coords.latitude, longitude: resp.coords.longitude}).subscribe(
-        error => console.log(error),
-        () => console.log("Request Finished")
-      );
-    }).catch((error) => {
-      console.log('Error getting location', error);
-    })
-
+    Geolocation.watchPosition( locationOptions )
+      .subscribe( ( position: Geoposition ) => {
+        console.log( "own position changed" );
+        this.ownLocation = {
+          latitude : position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        this.events.publish( 'ownPosition:updated', this.ownLocation );
+      } );
   }
+
+  /* =====================================
+   WATCH LOCATION OF SHARED CONTACTS
+   ===================================== */
+  private watchSharedContacts () {
+    setInterval( () => {
+      this.backendService.getLocations()
+        .subscribe( response => this.watchSharedContactsResponse( response ),
+          error => this.watchSharedContactsError( error ) );
+    }, 10000 );
+  }
+
+  private watchSharedContactsResponse ( response ) {
+    for ( let i = 0; i < response.length; i++ ) {
+      let username = response[ i ].username;
+      let position = {
+        latitude : response[ i ].coordinates.latitude,
+        longitude: response[ i ].coordinates.longitude
+      };
+      this.compareUsernameToSharedContacts( username, position )
+    }
+  }
+
+  private watchSharedContactsError ( error ) {
+    //this.warning = "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
+    console.log( error );
+  }
+
+  /* =====================================
+   ON FIRST LOAD: CHECK WHO HAS ACCESS TO MY LOCATION
+   ===================================== */
+
+  private whoDidIShare () {
+    this.backendService.getWhoDidIShare()
+      .subscribe( data => this.whoDidIShareResponse( data ), error => this.whoDidIShareError( error ) );
+  }
+
+  private whoDidIShareResponse ( response ) {
+    this.giveAccessTo.username = response.giveAccessTo;
+  }
+
+  private whoDidIShareError ( error ) {
+    this.giveAccessTo.username = "";
+    //this.warning = "Es ist ein Fehler bei der für Sie freigegebenen Standorte aufgetreten. Bitte versuchen Sie es erneut";
+    console.log( error );
+  }
+
+  /* =====================================
+   HELPER FUNCTION TO CHECK IF LOCATION OF FRIENDS HAS CHANGED
+   ===================================== */
+  private compareUsernameToSharedContacts ( username, position ) {
+    let notFound = true;
+    for ( let i = 0; i < this.sharedContacts.length; i++ ) {
+      //check if username is already in sharedContacts
+      if ( username === this.sharedContacts[ i ].username ) {
+        notFound = false;
+        //check if position has changed
+        if ( position.latitude != this.sharedContacts[ i ].position.latitude || position.longitude
+          != this.sharedContacts[ i ].position.longitude ) {
+          //save new position
+          this.sharedContacts[ i ].position.latitude = position.latitude;
+          this.sharedContacts[ i ].position.longitude = position.longitude;
+          this.events.publish( 'userPosition:updated', {
+            username: username,
+            position: position
+          } );
+        }
+      }
+    }
+    if ( notFound ) {
+      //save new shared contact
+      this.sharedContacts.push( {
+        username: username,
+        position: position
+      } );
+      this.events.publish( 'userPosition:new', {
+        username: username,
+        position: position
+      } );
+    }
+  }
+
+  /* ENHANCEMENT: compare and remove outdated contacts from list, otherwise the position will just stay the same
+   private cleanupSharedContacts(newList){}*/
+
 }
