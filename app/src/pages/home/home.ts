@@ -1,12 +1,9 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, Events } from 'ionic-angular';
 import { BackendService } from "../../app/Services/backendService";
-import { NgZone } from '@angular/core';
 import { LocationService } from "../../app/Services/locationService";
 import { ContactsPage } from '../contacts/contacts';
-
-
-declare let google;
+import { MapService } from '../../app/Services/mapService';
 
 @Component( {
   selector   : 'page-home',
@@ -14,51 +11,71 @@ declare let google;
 } )
 
 export class HomePage {
-  //Google Map
+  //get map element
   @ViewChild( 'map' ) mapElement: ElementRef;
-  private map: any;
-  //google maps routing
-  private directionsDisplay;
-  private directionsService;
+  //routing information
+  private calculateRouteTo;
 
   //contact who has access to your location (from locationService)
   private giveAccessTo;
   //Array for shared contacts (from locationService)
   public sharedContacts: Array<any>;
 
-  private ownMarker;
-  private contactsMarker;
-  //current route target
-  private calculateRouteTo;
   //Warning Message
   public notification;
   private resetNotificationTimer;
 
-  constructor ( public navCtrl: NavController, private backendService: BackendService, private zone: NgZone,
-                private locationService: LocationService, private events: Events ) {
+  constructor ( public navCtrl: NavController, private backendService: BackendService,
+                private locationService: LocationService, private events: Events, private mapService: MapService ) {
 
 
-    //initialise the array for shared contacts
-    this.contactsMarker = [];
-    this.calculateRouteTo = {};
     this.notification = {};
     this.sharedContacts = locationService.sharedContacts;
     this.giveAccessTo = locationService.giveAccessTo;
+    this.calculateRouteTo = mapService.calculateRouteTo;
 
   }
 
   ionViewDidLoad () {
-    //initializing the map and updating it with the position of shared contacts
-    this.initMap();
-    //initialize routing
-    this.initRoute();
+    //initializing the map and pass the map element to the map service
+    this.mapService.initMap( this.mapElement.nativeElement );
 
+    //start handling events
     this.handleEvents();
-
   }
 
   public clickShowContacts () {
     this.navCtrl.push( ContactsPage );
+  }
+
+  /* =====================================
+   INITIALISING
+   ===================================== */
+
+  public clickStopRouting () {
+    this.mapService.stopRouting();
+  }
+
+  public clickCalculateRoute ( contact ) {
+    this.mapService.calculateRouteToContact( contact );
+  }
+
+  /* =====================================
+   NOTIFICATIONS
+   ===================================== */
+
+  private resetNotifications () {
+    //make sure that timeout is cleared if there is an active one
+    if ( this.resetNotificationTimer ) {
+      clearTimeout( this.resetNotificationTimer );
+    }
+    this.resetNotificationTimer = setTimeout( () => {
+      this.resetNotificationTimer = null;
+      this.events.publish( "userNotification", {
+        text : "",
+        color: ""
+      } );
+    }, 10000 );
   }
 
   /* =====================================
@@ -102,183 +119,16 @@ export class HomePage {
   }
 
   /* =====================================
-   INITIALISING
-   ===================================== */
-  //this function initializes the map
-  private initMap () {
-    //map style
-    //let styles = [{"featureType":"all","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"},{"saturation":"-100"}]},{"featureType":"all","elementType":"labels.text.fill","stylers":[{"saturation":36},{"color":"#000000"},{"lightness":40},{"visibility":"off"}]},{"featureType":"all","elementType":"labels.text.stroke","stylers":[{"visibility":"off"},{"color":"#000000"},{"lightness":16}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":17},{"weight":1.2}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#4d6059"}]},{"featureType":"landscape","elementType":"geometry.stroke","stylers":[{"color":"#4d6059"}]},{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"color":"#4d6059"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"lightness":21}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#4d6059"}]},{"featureType":"poi","elementType":"geometry.stroke","stylers":[{"color":"#4d6059"}]},{"featureType":"road","elementType":"geometry","stylers":[{"visibility":"on"},{"color":"#7f8d89"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"},{"lightness":17}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#7f8d89"},{"lightness":29},{"weight":0.2}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":18}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":16}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#7f8d89"}]},{"featureType":"road.local","elementType":"geometry.stroke","stylers":[{"color":"#7f8d89"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":19}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#2b3638"},{"visibility":"on"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#2b3638"},{"lightness":17}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#24282b"}]},{"featureType":"water","elementType":"geometry.stroke","stylers":[{"color":"#24282b"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text.stroke","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.icon","stylers":[{"visibility":"off"}]}];
-    //creating map
-    let options = {
-      zoom     : 14,
-      mapTypeId: google.maps.MapTypeId.ROADMAP/*,
-       styles: styles*/
-    };
-    this.map = new google.maps.Map( this.mapElement.nativeElement, options );
-  }
-
-  private initRoute () {
-    // Create a renderer for directions and bind it to the map.
-    this.directionsDisplay = new google.maps.DirectionsRenderer( { map: this.map } );
-
-    // Instantiate a directions service.
-    this.directionsService = new google.maps.DirectionsService;
-  }
-
-
-  /* =====================================
-   CALCULATING ROUTE
-   ===================================== */
-
-  public clickStopRouting () {
-    this.directionsDisplay.setMap( null );
-    this.calculateRouteTo.username = null;
-  }
-
-  public clickCalculateRoute ( contact ) {
-    let toMarker;
-    let toContact;
-    //search the right marker
-    for ( let i = 0; i < this.contactsMarker.length; i++ ) {
-      if ( this.contactsMarker[ i ].username === contact.username ) {
-        toMarker = this.contactsMarker[ i ].marker;
-        toContact = this.contactsMarker[ i ].username;
-      }
-    }
-    if ( toMarker ) {
-      this.calculateRoute( this.ownMarker, toMarker );
-      this.calculateRouteTo.username = toContact;
-    } else {
-      this.events.publish( "userNotification", {
-        text : "Es ist ein Fehler bei der Routenberechnung aufgetreten. Der Marker des ausgewählten Kontakts existiert nicht."
-        + status,
-        color: "danger"
-      } );
-    }
-  }
-
-  //this function calculates the route between two markers
-  private calculateRoute ( fromMarker, toMarker ) {
-    this.directionsService.route( {
-      origin     : fromMarker.getPosition(),
-      destination: toMarker.getPosition(),
-      travelMode : google.maps.TravelMode.WALKING
-    }, ( response, status ) => {
-      if ( status === google.maps.DirectionsStatus.OK ) {
-
-        //using zone to fix variables not updating (google service)
-        this.zone.run( () => {
-          //store the active route information
-          this.calculateRouteTo.info = response.routes[ 0 ].legs[ 0 ].distance.text + ' - '
-            + response.routes[ 0 ].legs[ 0 ].duration.text;
-        } );
-
-        //show the route
-        this.directionsDisplay.setMap( this.map );
-        this.directionsDisplay.setDirections( response );
-      } else {
-        this.events.publish( "userNotification", {
-          text : "Es ist ein Fehler bei der Routenberechnung aufgetreten. Bitte versuchen Sie es erneut:" + status,
-          color: "danger"
-        } );
-      }
-    } );
-  }
-
-  /* =====================================
-   NOTIFICATIONS
-   ===================================== */
-
-  private resetNotifications () {
-    //make sure that timeout is cleared if there is an active one
-    if ( this.resetNotificationTimer ) {
-      clearTimeout( this.resetNotificationTimer );
-    }
-    this.resetNotificationTimer = setTimeout( () => {
-      this.resetNotificationTimer = null;
-      this.events.publish( "userNotification", {
-        text : "",
-        color: ""
-      } );
-    }, 10000 );
-  }
-
-
-  /* =====================================
    EVENTS
    ===================================== */
 
   private handleEvents () {
-
-    //own position updated
-    this.events.subscribe( 'ownPosition:updated', ( ownLocation ) => {
-      let gmapsPosition = {
-        lat: ownLocation[ 0 ].latitude,
-        lng: ownLocation[ 0 ].longitude
-      };
-      if ( !this.ownMarker ) {
-        //create new marker
-        this.map.setCenter( gmapsPosition );
-        this.ownMarker = new google.maps.Marker( {
-          map     : this.map,
-          position: gmapsPosition
-        } );
-      } else {
-        //update marker position
-        this.map.setCenter( gmapsPosition );
-        this.ownMarker.setPosition( gmapsPosition );
-      }
-
-    } );
-
-    this.events.subscribe( 'ownPosition:updated', () => {
-      this.locationService.upload();
-    } );
-
-    //new users position
-    this.events.subscribe( 'userPosition:new', ( userObject ) => {
-      let gmapsPosition = {
-        lat: userObject[ 0 ].position.latitude,
-        lng: userObject[ 0 ].position.longitude
-      };
-      console.log( "new marker added" );
-      //create marker
-      let marker = new google.maps.Marker( {
-        map     : this.map,
-        position: gmapsPosition
-      } );
-      //push to marker array
-      this.contactsMarker.push( {
-        username: userObject[ 0 ].username,
-        marker  : marker
-      } );
-    } );
-
-    //users position updated
-    this.events.subscribe( 'userPosition:updated', ( userObject ) => {
-      let gmapsPosition = {
-        lat: userObject[ 0 ].position.latitude,
-        lng: userObject[ 0 ].position.longitude
-      };
-      for ( let i = 0; i < this.contactsMarker.length; i++ ) {
-        //select the marker for this user
-        if ( this.contactsMarker[ i ].username === userObject[ 0 ].username ) {
-          this.contactsMarker[ i ].marker.setPosition( gmapsPosition );
-          //if this user is also the current "Route-User"
-          if ( this.calculateRouteTo.username === userObject[ 0 ].username ) {
-            this.calculateRoute( this.ownMarker, this.contactsMarker[ i ].marker );
-          }
-        }
-      }
-      console.log( "marker position updated" );
-    } );
-
     //new user notification
     this.events.subscribe( 'userNotification', ( notificationObject ) => {
       this.resetNotifications();
-      this.notification.text = notificationObject[ 0 ].text;
+      this.notification.text = notificationObject.text;
       //colors: danger->red, primary->blue, secondary->green, default->white
-      this.notification.color = notificationObject[ 0 ].color;
+      this.notification.color = notificationObject.color;
     } );
   }
 
@@ -286,14 +136,13 @@ export class HomePage {
    TODO
    ===================================== */
 
-  //TODO: GMAP FUNCTIONS to service
-
 
   /* ENHANCEMENT:
+   - Tutorial Slider Intro
    - compare and remove outdated contacts from shared contacts list,
    otherwise the position will just stay the same if they stop sharing their position
    - Show a loading bar and/or wait till contacts are loaded before removing the Splashscreen
-  */
+   */
 
 
 }

@@ -10,6 +10,7 @@ import {RegistrationPage} from "../pages/registration/registration";
 import {BackendService} from "./Services/backendService";
 import {Storage} from '@ionic/storage';
 import {LocationService} from "./Services/locationService";
+import { MapService } from './Services/mapService';
 
 
 @NgModule({
@@ -35,7 +36,7 @@ import {LocationService} from "./Services/locationService";
     LoginPage,
     RegistrationPage
   ],
-  providers: [LocationService, BackendService, Storage, {provide: ErrorHandler, useClass: IonicErrorHandler}]
+  providers: [MapService, LocationService, BackendService, Storage, {provide: ErrorHandler, useClass: IonicErrorHandler}]
 })
 export class AppModule {
 }

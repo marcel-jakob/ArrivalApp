@@ -39,6 +39,7 @@ export class LocationService {
             longitude: position.coords.longitude
           };
           this.events.publish( 'ownPosition:updated', this.ownLocation );
+          this.upload();
         } else {
           this.events.publish( "userNotification", {
             text : "Es ist ein Fehler bei der Standortabfrage aufgetreten. Bitte überprüfen Sie Ihre Einstellungen und versuchen Sie es erneut.",
