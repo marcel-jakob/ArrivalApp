@@ -46,6 +46,33 @@ Um seinen Standort freizugeben muss man in der Kontaktliste (wird durch den "Kon
 <img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
 <img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
 
+##Projektstruktur
+
+###Frontend (/app/src/)
+
+**app/**
+- **Services/backendService.ts** Service zur Kommunikation mit dem Backend
+- **Services/locationService.ts** Service zur Überwachung der eigenen und der Position von Kontakten.
+- **Services/mapService.ts** Service zur Steuerung der Google Map (Marker, Route)
+- **app.component.ts** Beim ersten Start wird zur richtigen Seite navigiert.
+
+**pages/**
+- **firststart** Erster Start mit Eingabe des Benutzernamens.
+- **login** Seite zum Einloggen falls der Account bereits existiert.
+- **registration** Seite zum Registrieren für neue User.
+- **home** Hauptseite mit Markern und Routen.
+- **contacts** Kontaktliste
+- **add-contact** Seite zum Hinzufügen neuer Kontakte.
+
+###Backend (/backend/)
+- **app.js** Server starten, Dateien einbinden
+- **allow-cross-domain.js** erlaubt das Senden von jwt im Header bei cross-domains
+- **db-connection.js** Verbindung zur Datenbank
+- **public-routes.js** öffentlich Zugängliche Routen
+- **authorization.js** überprüft das jwt auf Gültigkeit
+- **private-routes.js** durch jwt geschützte Routen
+- **secretkey.js** geheimer Schüssel (nicht im repo)
+
 ##Besonderes
 
 ###Token für Backend Access
