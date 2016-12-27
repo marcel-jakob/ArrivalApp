@@ -119,8 +119,8 @@ export class MapService {
     //own position updated
     this.events.subscribe( 'ownPosition:updated', ( ownLocation ) => {
       let gmapsPosition = {
-        lat: ownLocation[ 0 ].latitude,
-        lng: ownLocation[ 0 ].longitude
+        lat: ownLocation.latitude,
+        lng: ownLocation.longitude
       };
       this.map.setCenter( gmapsPosition );
 
@@ -140,8 +140,8 @@ export class MapService {
     //new users position
     this.events.subscribe( 'userPosition:new', ( userObject ) => {
       let gmapsPosition = {
-        lat: userObject[ 0 ].position.latitude,
-        lng: userObject[ 0 ].position.longitude
+        lat: userObject.position.latitude,
+        lng: userObject.position.longitude
       };
       console.log( "new marker added" );
       //create marker
@@ -151,7 +151,7 @@ export class MapService {
       } );
       //push to marker array
       this.contactsMarker.push( {
-        username: userObject[ 0 ].username,
+        username: userObject.username,
         marker  : marker
       } );
     } );
@@ -159,15 +159,15 @@ export class MapService {
     //users position updated
     this.events.subscribe( 'userPosition:updated', ( userObject ) => {
       let gmapsPosition = {
-        lat: userObject[ 0 ].position.latitude,
-        lng: userObject[ 0 ].position.longitude
+        lat: userObject.position.latitude,
+        lng: userObject.position.longitude
       };
       for ( let i = 0; i < this.contactsMarker.length; i++ ) {
         //select the marker for this user
-        if ( this.contactsMarker[ i ].username === userObject[ 0 ].username ) {
+        if ( this.contactsMarker[ i ].username === userObject.username ) {
           this.contactsMarker[ i ].marker.setPosition( gmapsPosition );
           //if this user is also the current "Route-User"
-          if ( this.calculateRouteTo.username === userObject[ 0 ].username ) {
+          if ( this.calculateRouteTo.username === userObject.username ) {
             this.calculateRouteBetweenMarker( this.ownMarker, this.contactsMarker[ i ].marker );
           }
         }

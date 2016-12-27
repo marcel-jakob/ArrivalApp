@@ -126,9 +126,9 @@ export class HomePage {
     //new user notification
     this.events.subscribe( 'userNotification', ( notificationObject ) => {
       this.resetNotifications();
-      this.notification.text = notificationObject[ 0 ].text;
+      this.notification.text = notificationObject.text;
       //colors: danger->red, primary->blue, secondary->green, default->white
-      this.notification.color = notificationObject[ 0 ].color;
+      this.notification.color = notificationObject.color;
     } );
   }
 
@@ -138,6 +138,7 @@ export class HomePage {
 
 
   /* ENHANCEMENT:
+   - Tutorial Slider Intro
    - compare and remove outdated contacts from shared contacts list,
    otherwise the position will just stay the same if they stop sharing their position
    - Show a loading bar and/or wait till contacts are loaded before removing the Splashscreen
