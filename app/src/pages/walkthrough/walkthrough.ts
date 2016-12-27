@@ -11,7 +11,7 @@ export class WalkthroughPage {
 
   constructor ( public navCtrl: NavController ) {
     this.mySlideOptions = {
-      autoplay: 3000,
+      autoplay: 7000,
       pager   : true
     };
   }
