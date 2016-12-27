@@ -31,7 +31,8 @@ export class HomePage {
   //current route target
   private calculateRouteTo;
   //Warning Message
-  public warning: string;
+  public notification;
+  private resetNotificationTimer;
 
   constructor ( public navCtrl: NavController, private backendService: BackendService, private zone: NgZone,
                 private locationService: LocationService, private events: Events ) {
@@ -40,8 +41,10 @@ export class HomePage {
     //initialise the array for shared contacts
     this.contactsMarker = [];
     this.calculateRouteTo = {};
+    this.notification = {};
     this.sharedContacts = locationService.sharedContacts;
     this.giveAccessTo = locationService.giveAccessTo;
+
   }
 
   ionViewDidLoad () {
@@ -51,6 +54,7 @@ export class HomePage {
     this.initRoute();
 
     this.handleEvents();
+
   }
 
   public clickShowContacts () {
@@ -73,7 +77,10 @@ export class HomePage {
 
   private handleGiveAccessError ( error ) {
     console.log( error );
-    this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
   }
 
   public clickRemoveAccess () {
@@ -88,7 +95,10 @@ export class HomePage {
 
   private handleRemoveAccessError ( error ) {
     console.log( error );
-    this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Deaktivierung der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
   }
 
   /* =====================================
@@ -120,6 +130,11 @@ export class HomePage {
    CALCULATING ROUTE
    ===================================== */
 
+  public clickStopRouting () {
+    this.directionsDisplay.setMap( null );
+    this.calculateRouteTo.username = null;
+  }
+
   public clickCalculateRoute ( contact ) {
     let toMarker;
     let toContact;
@@ -134,14 +149,16 @@ export class HomePage {
       this.calculateRoute( this.ownMarker, toMarker );
       this.calculateRouteTo.username = toContact;
     } else {
-      console.log( "error calculating route, marker does not exist" );
+      this.events.publish( "userNotification", {
+        text : "Es ist ein Fehler bei der Routenberechnung aufgetreten. Der Marker des ausgewählten Kontakts existiert nicht."
+        + status,
+        color: "danger"
+      } );
     }
   }
 
   //this function calculates the route between two markers
   private calculateRoute ( fromMarker, toMarker ) {
-    //this.resetMarker();
-
     this.directionsService.route( {
       origin     : fromMarker.getPosition(),
       destination: toMarker.getPosition(),
@@ -157,11 +174,33 @@ export class HomePage {
         } );
 
         //show the route
+        this.directionsDisplay.setMap( this.map );
         this.directionsDisplay.setDirections( response );
       } else {
-        this.warning = 'Directions request failed due to ' + status;
+        this.events.publish( "userNotification", {
+          text : "Es ist ein Fehler bei der Routenberechnung aufgetreten. Bitte versuchen Sie es erneut:" + status,
+          color: "danger"
+        } );
       }
     } );
+  }
+
+  /* =====================================
+   NOTIFICATIONS
+   ===================================== */
+
+  private resetNotifications () {
+    //make sure that timeout is cleared if there is an active one
+    if ( this.resetNotificationTimer ) {
+      clearTimeout( this.resetNotificationTimer );
+    }
+    this.resetNotificationTimer = setTimeout( () => {
+      this.resetNotificationTimer = null;
+      this.events.publish( "userNotification", {
+        text : "",
+        color: ""
+      } );
+    }, 10000 );
   }
 
 
@@ -217,7 +256,29 @@ export class HomePage {
 
     //users position updated
     this.events.subscribe( 'userPosition:updated', ( userObject ) => {
+      let gmapsPosition = {
+        lat: userObject[ 0 ].position.latitude,
+        lng: userObject[ 0 ].position.longitude
+      };
+      for ( let i = 0; i < this.contactsMarker.length; i++ ) {
+        //select the marker for this user
+        if ( this.contactsMarker[ i ].username === userObject[ 0 ].username ) {
+          this.contactsMarker[ i ].marker.setPosition( gmapsPosition );
+          //if this user is also the current "Route-User"
+          if ( this.calculateRouteTo.username === userObject[ 0 ].username ) {
+            this.calculateRoute( this.ownMarker, this.contactsMarker[ i ].marker );
+          }
+        }
+      }
       console.log( "marker position updated" );
+    } );
+
+    //new user notification
+    this.events.subscribe( 'userNotification', ( notificationObject ) => {
+      this.resetNotifications();
+      this.notification.text = notificationObject[ 0 ].text;
+      //colors: danger->red, primary->blue, secondary->green, default->white
+      this.notification.color = notificationObject[ 0 ].color;
     } );
   }
 
@@ -225,21 +286,14 @@ export class HomePage {
    TODO
    ===================================== */
 
-  //TODO: loading contacts notification (like errors)
-  //TODO: delete route
-  //TODO: event with warnings/errors
   //TODO: GMAP FUNCTIONS to service
-  //TODO: recalculate route
-  // this function recalculates the route if necessary
-  /* private updateRoute () {
-   if ( this.calculateRouteTo ) {
-   //show if calculateRoue to is in array of shared contacts
-   for ( let i = 0; i < this.sharedContacts.length; i++ ) {
-   if ( this.sharedContacts[ i ].name === this.calculateRouteTo.name ) {
-   this.calculateRoute( this.ownMarker, this.sharedContacts[ i ] );
-   }
-   }
-   }
-   }*/
+
+
+  /* ENHANCEMENT:
+   - compare and remove outdated contacts from shared contacts list,
+   otherwise the position will just stay the same if they stop sharing their position
+   - Show a loading bar and/or wait till contacts are loaded before removing the Splashscreen
+  */
+
 
 }

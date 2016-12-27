@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, ActionSheetController } from 'ionic-angular';
+import { NavController, ActionSheetController, Events } from 'ionic-angular';
 import { AddContactPage } from '../add-contact/add-contact';
 import { Storage } from '@ionic/storage';
 import { LocationService } from "../../app/Services/locationService";
@@ -11,24 +11,18 @@ import { BackendService } from "../../app/Services/backendService";
 } )
 export class ContactsPage {
   public contacts: Array<any>;
-  public warning: string;
   public giveAccessTo;
 
   constructor ( private locationService: LocationService, private navCtrl: NavController,
                 private backendService: BackendService, private storage: Storage,
-                private actionSheetCtrl: ActionSheetController ) {
+                private actionSheetCtrl: ActionSheetController, private events: Events ) {
     this.giveAccessTo = locationService.giveAccessTo;
   }
 
   ionViewWillEnter () {
     this.storage.get( 'contacts' )
       .then( ( contactList ) => {
-        if ( contactList ) {
-          this.contacts = contactList;
-          this.warning = "";
-        } else {
-          this.warning = "Keine Kontakte gefunden.";
-        }
+        this.contacts = contactList;
       } );
   }
 
@@ -38,6 +32,7 @@ export class ContactsPage {
 
   public clickContact ( contactName ) {
     let buttons;
+    //show input dialog whether give or remove access
     if ( this.giveAccessTo.username === contactName ) {
       buttons = [
         {
@@ -89,7 +84,11 @@ export class ContactsPage {
 
   private handleGiveAccessError ( error ) {
     console.log( error );
-    this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
+    this.navCtrl.popToRoot();
   }
 
   //remove access
@@ -104,7 +103,11 @@ export class ContactsPage {
 
   private handleRemoveAccessError ( error ) {
     console.log( error );
-    this.warning = "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte versuchen Sie es erneut";
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Deaktivierung der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
+    this.navCtrl.popToRoot();
   }
 
 }
