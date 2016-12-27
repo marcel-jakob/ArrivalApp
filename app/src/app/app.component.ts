@@ -4,7 +4,7 @@ import {StatusBar, Splashscreen} from 'ionic-native';
 import {Storage} from '@ionic/storage';
 import {BackendService} from "./Services/backendService";
 import {HomePage} from '../pages/home/home';
-import {FirststartPage} from "../pages/firststart/firststart";
+import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 
 
 @Component({
@@ -25,7 +25,7 @@ export class MyApp {
   private init() {
     this.storage.get('jwt').then((jwt) => {
       if (!jwt) {
-        this.rootPage = FirststartPage;
+        this.rootPage = WalkthroughPage;
         console.log("no stored jwt, navigating to firststart");
       }
       else {

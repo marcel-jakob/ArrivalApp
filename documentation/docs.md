@@ -75,6 +75,9 @@ Um seinen Standort freizugeben muss man in der Kontaktliste (wird durch den "Kon
 
 ##Besonderes
 
+###Kompatibilität
+Nach aktuellem Stand ist ArrivalApp lauffähig auf Android und im Web.
+
 ###Token für Backend Access
 Durch den token wird im Backend Zugriff auf die private routes gewährt. Er besteht aus einem geheimen key, um eine sichere Verbindung zu dem backend zu gewähren. Außerdem wird der username in verschlüsselter Form in dem token gespeichert, der von dem backend ausgelesen werden kann.
 

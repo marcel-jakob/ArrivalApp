@@ -132,17 +132,4 @@ export class HomePage {
     } );
   }
 
-  /* =====================================
-   TODO
-   ===================================== */
-
-
-  /* ENHANCEMENT:
-   - Tutorial Slider Intro
-   - compare and remove outdated contacts from shared contacts list,
-   otherwise the position will just stay the same if they stop sharing their position
-   - Show a loading bar and/or wait till contacts are loaded before removing the Splashscreen
-   */
-
-
 }
