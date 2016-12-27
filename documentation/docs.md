@@ -46,7 +46,7 @@ Um seinen Standort freizugeben muss man in der Kontaktliste (wird durch den "Kon
 <img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
 <img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
 
-##Projektstrultur
+##Projektstruktur
 
 ###Frontend (/app/src/)
 
@@ -56,7 +56,7 @@ Um seinen Standort freizugeben muss man in der Kontaktliste (wird durch den "Kon
 - **Services/mapService.ts** Service zur Steuerung der Google Map (Marker, Route)
 - **app.component.ts** Beim ersten Start wird zur richtigen Seite navigiert.
 
-**pages**
+**pages/**
 - **firststart** Erster Start mit Eingabe des Benutzernamens.
 - **login** Seite zum Einloggen falls der Account bereits existiert.
 - **registration** Seite zum Registrieren für neue User.
