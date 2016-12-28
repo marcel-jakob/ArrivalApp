@@ -1,79 +1,113 @@
-import {Component} from '@angular/core';
-import {NavController, ActionSheetController} from 'ionic-angular';
-import {AddContactPage} from '../add-contact/add-contact';
-import {Storage} from '@ionic/storage';
-import {BackendService} from "../../../.tmp/app/Services/backendService";
-import {LocationService} from "../../app/Services/locationService";
+import { Component } from '@angular/core';
+import { NavController, ActionSheetController, Events } from 'ionic-angular';
+import { AddContactPage } from '../add-contact/add-contact';
+import { Storage } from '@ionic/storage';
+import { LocationService } from "../../app/Services/locationService";
+import { BackendService } from "../../app/Services/backendService";
 
-@Component({
-  selector: 'page-contacts',
-  templateUrl: 'contacts.html',
-  providers: [Storage, BackendService, LocationService]
-})
+@Component( {
+  selector   : 'page-contacts',
+  templateUrl: 'contacts.html'
+} )
 export class ContactsPage {
   public contacts: Array<any>;
-  public notification: string;
-  public giveAccessTo: string;
+  public giveAccessTo;
 
-  constructor(private locationService: LocationService, private navCtrl: NavController, private backendService: BackendService, private storage: Storage, private actionSheetCtrl: ActionSheetController) {
-
+  constructor ( private locationService: LocationService, private navCtrl: NavController,
+                private backendService: BackendService, private storage: Storage,
+                private actionSheetCtrl: ActionSheetController, private events: Events ) {
+    this.giveAccessTo = locationService.giveAccessTo;
   }
-  ionViewDidEnter() {
-    this.storage.get('contacts').then((contactList) => {
-      if (contactList) {
+
+  ionViewWillEnter () {
+    this.storage.get( 'contacts' )
+      .then( ( contactList ) => {
         this.contacts = contactList;
-        this.notification = "";
-        this.storage.get('giveAccessTo').then((accessTo) => {
-          if (accessTo) {
-            this.giveAccessTo = accessTo;
-          }
-          else {
-            this.giveAccessTo = "";
-          }
-        });
-      }
-      else {
-        this.notification = "Keine Kontakte gefunden.";
-      }
-    });
+      } );
   }
 
-  clickAddContact() {
-    this.navCtrl.push(AddContactPage);
+  public clickAddContact () {
+    this.navCtrl.push( AddContactPage );
   }
-  clickContact(contactName){
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'Kontakt: '+contactName,
-      buttons: [
+
+  public clickContact ( contactName ) {
+    let buttons;
+    //show input dialog whether give or remove access
+    if ( this.giveAccessTo.username === contactName ) {
+      buttons = [
         {
-          text: 'Standort freigeben',
+          text   : 'Standort nicht mehr freigeben',
           handler: () => {
-            this.giveAccess(contactName);
+            this.clickRemoveAccess();
           }
-        },{
+        },
+        {
           text: 'Abbrechen',
           role: 'cancel'
         }
       ]
-    });
+    } else {
+      buttons = [
+        {
+          text   : 'Standort freigeben',
+          handler: () => {
+            this.clickGiveAccess( contactName );
+          }
+        },
+        {
+          text: 'Abbrechen',
+          role: 'cancel'
+        }
+      ]
+    }
+    let actionSheet = this.actionSheetCtrl.create( {
+      title  : 'Kontakt: ' + contactName,
+      buttons: buttons
+    } );
     actionSheet.present();
   }
-  giveAccess(contactName){
-    this.backendService.giveAccess(contactName).subscribe(
-      response => this.handleResponse(contactName),
-      error => this.handleError(error),
-      () => console.log("Request Finished")
-    );
+
+
+  /* =====================================
+   GIVE OR REMOVE ACCESS to contacts
+   ===================================== */
+  //give access
+  public clickGiveAccess ( contactName ) {
+    this.backendService.giveAccessTo( contactName )
+      .subscribe( response => this.handleGiveAccessResponse( contactName ),
+        error => this.handleGiveAccessError( error ) );
   }
 
-  handleResponse(contactName){
-    this.storage.set('giveAccessTo', contactName);
-    this.giveAccessTo = contactName;
-    this.locationService.upload();
+  private handleGiveAccessResponse ( contactName ) {
+    this.giveAccessTo.username = contactName;
   }
 
-  handleError(error){
-    console.log(error);
-    this.notification = "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut";
+  private handleGiveAccessError ( error ) {
+    console.log( error );
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
+    this.navCtrl.popToRoot();
   }
+
+  //remove access
+  public clickRemoveAccess () {
+    this.backendService.removeAccess()
+      .subscribe( response => this.handleRemoveAccessResponse(), error => this.handleRemoveAccessError( error ) );
+  }
+
+  private handleRemoveAccessResponse () {
+    this.giveAccessTo.username = "";
+  }
+
+  private handleRemoveAccessError ( error ) {
+    console.log( error );
+    this.events.publish( "userNotification", {
+      text : "Es ist ein Fehler bei der Deaktivierung der Standortfreigabe aufgetreten. Bitte sorgen Sie für eine aktive Internetverbindung und versuchen Sie es erneut.",
+      color: "danger"
+    } );
+    this.navCtrl.popToRoot();
+  }
+
 }

@@ -14,7 +14,6 @@ app.use(bodyParser.json());
 var allowCrossDomain = require('./allow-cross-domain');
 app.use(allowCrossDomain);
 
-
 // ### Public Routes
 var publicRoutes = require('./public-routes');
 app.use(publicRoutes);

@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
-import {Storage} from '@ionic/storage';
 
 @Injectable()
 export class BackendService {
@@ -10,26 +9,60 @@ export class BackendService {
   private headers = new Headers({'Content-Type': 'application/json'});
   private options = new RequestOptions({headers: this.headers});
 
-  constructor(private http: Http, private storage: Storage) {
-    this.updateJWT();
+  constructor(private http: Http) {
 
   }
 
-  private updateJWT() {
-    this.storage.get('jwt').then((jwt) => {
-      if (jwt) {
-        this.jwt = jwt;
-        this.headers = new Headers({'Content-Type': 'application/json', "jwt": this.jwt});
-        this.options = new RequestOptions({headers: this.headers});
-      }
-    });
-  }
+  public saveJWT(jwt){
+    this.jwt = jwt;
+    this.headers = new Headers({'Content-Type': 'application/json', "jwt": this.jwt});
+    this.options = new RequestOptions({headers: this.headers});
+  };
 
-  //public routes
+  /* =====================================
+   PUBLIC ROUTES
+   ===================================== */
   public postNewUser(username: string, password: string) {
     let body = {username: username, password: password};
     return this.http.post(this.backendUrl + "newUser/", body, this.options).map(this.extractData);
   }
+
+  public getCheckUser(id: any) {
+    return this.http.get(this.backendUrl + "checkUser/" + id, this.options).map(this.extractStatusCode);
+  }
+
+  public postLoginUser(username: string, password: string) {
+    let body = {username: username, password: password};
+    return this.http.post(this.backendUrl + "loginUser/", body, this.options).map(this.extractData);
+  }
+
+  /* =====================================
+   PRIVATE ROUTE
+   ===================================== */
+  public giveAccessTo(forId: string) {
+    return this.http.get(this.backendUrl + "giveAccessTo/" + forId, this.options);
+  }
+
+  public removeAccess() {
+    return this.http.get(this.backendUrl + "removeAccess/", this.options);
+  }
+
+  public uploadLocation(coords){
+    let body = {coordinates: coords};
+    return this.http.post(this.backendUrl + "uploadLocation/", body, this.options);
+  }
+
+  public getLocations(){
+    return this.http.get(this.backendUrl + "getLocations/", this.options).map(this.extractData);
+  }
+
+  public getWhoDidIShare(){
+    return this.http.get(this.backendUrl + "whoDidIShare/", this.options).map(this.extractData);
+  }
+
+  /* =====================================
+   HELPER FUNCTIONS
+   ===================================== */
 
   private extractData(res: Response) {
     let body;
@@ -40,11 +73,6 @@ export class BackendService {
     else {
       return {};
     }
-
-  }
-
-  public getCheckUser(id: any) {
-    return this.http.get(this.backendUrl + "checkUser/" + id, this.options).map(this.extractStatusCode);
   }
 
   private extractStatusCode(res: Response) {
@@ -60,20 +88,5 @@ export class BackendService {
       console.log("res");
       return 404
     }
-  }
-
-  public postLoginUser(username: string, password: string) {
-    let body = {username: username, password: password};
-    return this.http.post(this.backendUrl + "loginUser/", body, this.options).map(this.extractData);
-  }
-
-  //private routes
-  public giveAccess(forId: string) {
-    return this.http.get(this.backendUrl + "giveAccess/" + forId, this.options);
-  }
-
-  public uploadLocation(coords){
-    let body = {coordinates: coords};
-    return this.http.post(this.backendUrl + "uploadLocation/", body, this.options);
   }
 }

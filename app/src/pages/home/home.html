@@ -6,7 +6,53 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content>
   <div #map id="map"></div>
-  <button ion-button block (click)="clickSendLocation()">Standort senden</button>
+
+  <ion-card *ngIf="notification.text" color="{{notification.color}}">
+    <ion-card-content>
+      {{notification.text}}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-content *ngIf="!sharedContacts.length">
+      Es ist kein Standort für Sie freigegeben oder diese werden gerade geladen. Bitte warten Sie einen Moment.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="sharedContacts.length">
+    <ion-card-content>
+      Folgende Kontakte haben Ihren Standort für Sie freigegeben:
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngFor="let contact of sharedContacts">
+    <ion-card-header>
+      {{contact.username}}
+    </ion-card-header>
+    <ion-list>
+      <button *ngIf="contact.username != giveAccessTo.username" ion-item (click)="clickGiveAccess(contact.username)">
+        <ion-icon name="locate" item-left></ion-icon>
+        eigenen Standort senden
+      </button>
+      <button *ngIf="contact.username === giveAccessTo.username" ion-item (click)="clickRemoveAccess()">
+        <ion-icon name="locate" item-left color="primary"></ion-icon>
+        Du teilst deinen Standort
+      </button>
+
+      <button *ngIf="contact.username != calculateRouteTo.username" ion-item (click)="clickCalculateRoute(contact)">
+        <ion-icon name="map" item-left></ion-icon>
+        Route berechnen
+      </button>
+
+      <button *ngIf="contact.username === calculateRouteTo.username" ion-item (click)="clickStopRouting()">
+        <ion-icon name="map" item-left color="primary"></ion-icon>
+        {{calculateRouteTo.info}}
+      </button>
+    </ion-list>
+  </ion-card>
+  <ion-navbar>
+    <button ion-button block (click)="clickShowContacts()">Kontaktliste anzeigen</button>
+  </ion-navbar>
 </ion-content>

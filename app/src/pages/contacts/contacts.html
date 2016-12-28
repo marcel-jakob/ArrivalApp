@@ -1,22 +1,26 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Verfügbare Kontakte
+      Kontaktliste
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let contact of contacts" (click)="clickContact(contact.name)">
+    <ion-item *ngIf="!contacts">
+      <h2>Keine Kontakte gefunden.</h2>
+    </ion-item>
+  </ion-list>
+  <ion-list>
+    <ion-item *ngFor="let contact of contacts" (click)="clickContact(contact.username)">
       <ion-avatar item-left>
         <img src="https://api.adorable.io/avatars/285/1.png">
       </ion-avatar>
-      <ion-icon *ngIf="contact.name === giveAccessTo" name="locate"></ion-icon>
-      <h2>{{contact.name}}</h2>
+      <ion-icon *ngIf="contact.username === giveAccessTo.username" name="locate"></ion-icon>
+      <h2>{{contact.username}}</h2>
     </ion-item>
   </ion-list>
-  {{notification}}
 
   <ion-footer>
     <ion-navbar>
