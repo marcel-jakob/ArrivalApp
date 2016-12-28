@@ -35,7 +35,7 @@ Um einen neuen Kontakt zu der Kontakliste hinzuzufügen muss im Hauptscreen zuer
 
 Wenn man einen neuen Kontakt hinzufügen möchte, wird man dazu aufgefordert den entsprechenden Namen in eine Texteingabe zu schreiben. Sofern der User im backend bekannt ist, wird er zur Kontaktliste hinzugefügt.
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/4.png" width="220">
+<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/4.png" width="220" style="border: 1px solid black">
 <img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/5.png" width="220">
 <img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/6.png" width="220">
 
