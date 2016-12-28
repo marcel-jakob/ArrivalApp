@@ -26,9 +26,9 @@ Beim dem ersten Start der App wird eine seperate Seite angezeigt, in die man den
 Ist der eingegebene Benutzername schon gespeichert, öffnet sich eine Seite, in die das Passwort eingegeben werden kann.
 Wenn der Name noch nicht bekannt ist öffnet sich die Regestrierungs-Seite in der man ein neues Passwort für den Benutzernamen wählen kann.
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/1.png" width="150">
-<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/2.png" width="150">
-<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/3.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/1.png" width="200">
+<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/2.png" width="200">
+<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/3.png" width="200">
 
 ###Neue Kontakte hinzufügen
 Um einen neuen Kontakt zu der Kontakliste hinzuzufügen muss im Hauptscreen zuerst auf den "Kontaktliste anzeigen"-Button gedrückt werden. Danach öffnet sich eine neue Seite, welche die verfügbaren Kontakte anzeigt. Hier kann man jetzt entweder einen neuen Kontakt hinzufügen, oder man teilt direkt den Standort.
@@ -42,9 +42,8 @@ Wenn man einen neuen Kontakt hinzufügen möchte, wird man dazu aufgefordert den
 ###Standort teilen
 Um seinen Standort freizugeben muss man in der Kontaktliste (wird durch den "Kontaktliste anzeigen"-Button im Hauptscreen geöffnet) einfach nur den ensprechenden Kontakt auswählen und im erscheinenden Kontextmenü auf "Standort freigeben" drücken.
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/8.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/development/documentation/pictures/7.png" width="150">
 
 ##Projektstruktur
 
