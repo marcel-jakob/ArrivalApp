@@ -26,9 +26,9 @@ Beim dem ersten Start der App wird eine seperate Seite angezeigt, in die man den
 Ist der eingegebene Benutzername schon gespeichert, öffnet sich eine Seite, in die das Passwort eingegeben werden kann.
 Wenn der Name noch nicht bekannt ist öffnet sich die Regestrierungs-Seite in der man ein neues Passwort für den Benutzernamen wählen kann.
 
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
-<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/sampleScreenshot.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/1.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/2.png" width="150">
+<img src="https://github.com/marcjako/ArrivalApp/blob/feat_docs/documentation/pictures/3.png" width="150">
 
 ###Neue Kontakte hinzufügen
 Um einen neuen Kontakt zu der Kontakliste hinzuzufügen muss im Hauptscreen zuerst auf den "Kontaktliste anzeigen"-Button gedrückt werden. Danach öffnet sich eine neue Seite, welche die verfügbaren Kontakte anzeigt. Hier kann man jetzt entweder einen neuen Kontakt hinzufügen, oder man teilt direkt den Standort.
